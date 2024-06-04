@@ -1,4 +1,4 @@
-max_runtime = 3600
+max_runtime = 10800
 LOAD_NODES = True # if true load nodes and compute euclidian distances. if False load edges
 D2T = 1 # distance to time factor
 D2C = 1 # distance to cost factor

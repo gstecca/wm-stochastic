@@ -104,6 +104,7 @@ class Instance:
 
 
 def load_instance(filename):
+    #this will load instances
     dfp = pd.read_excel(filename, sheet_name='params', index_col='param')
     dfn = pd.read_excel(filename, sheet_name='nodes')
     dfe = pd.read_excel(filename, sheet_name='edges', dtype={'i':int, 'j':int, 'c':float, 't':float})

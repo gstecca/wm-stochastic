@@ -1,5 +1,7 @@
 import pandas as pd
 import math
+import json
+import gurobipy as gb
 from params import *
 
 class node:
@@ -101,7 +103,132 @@ class Instance:
 
         return s
 
+class mymodel:
+    def __init__(self):
+        self.m : gb.Model = None
+        self.x = {}
+        self.U = {}
+        self.TBar = {}
+        self.y = {}
+        self.Q = {}
+        self.R = {}
+        self.L = {}
+        self.rho = {}
+        self.lambd = {}
+        self.alpha = {}
+        self.Z1 = None
+        self.Z2 = None
+        self.Z3 = None
+        self.Z4 = None
+    def set(self, m, x, U, TBar, y, Q, R, L, rho, lambd, alpha, Z1, Z2, Z3, Z4, Z5):
+        self.m = m
+        self.x = x
+        self.U = U
+        self.TBar =TBar
+        self.y = y
+        self.Q = Q
+        self.R = R
+        self.L = L
+        self.rho = rho
+        self.lambd = lambd
+        self.alpha = alpha
+        self.Z1 = Z1
+        self.Z2 = Z2
+        self.Z3 = Z3
+        self.Z4 = Z4
+        self.Z5 = Z5
 
+    def to_excel(self, inst: Instance):
+        filename = 'results/' + inst.name + "_res" 
+        filename += '_fix.xlsx' if FIX_SOLUTION==True  else '.xlsx'
+        # create a excel writer object
+        df_gen = pd.DataFrame(columns=['param', 'value'])
+        df_gen.loc[len(df_gen)] = ['Inst name', inst.name]
+        df_gen.loc[len(df_gen)] = ['objValue', self.m.ObjVal]
+        df_gen.loc[len(df_gen)] = ['runtime', self.m.Runtime]
+        df_gen.loc[len(df_gen)] = ['gap', self.m.MIPGap]
+        df_gen.loc[len(df_gen)] = ['Z1', self.Z1.getValue()]
+        df_gen.loc[len(df_gen)] = ['Z2', self.Z2.getValue()]
+        df_gen.loc[len(df_gen)] = ['Z3', self.Z3.getValue()]
+        df_gen.loc[len(df_gen)] = ['Z4', self.Z4.getValue()]
+        df_gen.loc[len(df_gen)] = ['Z5', self.Z5.getValue()]
+
+        df_x = pd.DataFrame()
+        df_x['i'] = [k[0] for k in self.x.keys() ]
+        df_x['j'] = [k[1] for k in self.x.keys() ]
+        df_x['x'] = [v.X for v in self.x.values() ]
+        df_x = df_x[df_x['x'] > 1e-4]
+
+        df_U = pd.DataFrame()
+        df_U['j'] = [k[0] for k in self.U.keys() ]
+        df_U['t'] = [k[1] for k in self.U.keys() ]
+        df_U['U'] = [v.X for v in self.U.values() ]
+        df_U = df_U[df_U['U'] > 1e-4]
+
+        df_TBar = pd.DataFrame()
+        df_TBar['i'] = [k for k in self.TBar.keys() ]
+        df_TBar['TBar'] = [v.X for v in self.TBar.values() ]
+
+        df_y = pd.DataFrame()
+        df_y['i'] = [k[0] for k in self.y.keys() ]
+        df_y['j'] = [k[1] for k in self.y.keys() ]
+        df_y['s'] = [k[2] for k in self.y.keys() ]
+        df_y['y'] = [v.X for v in self.y.values() ]
+        df_y = df_y[df_y['y'] > 1e-4]
+
+        df_Q = pd.DataFrame()
+        df_Q['j'] = [k[0] for k in self.Q.keys() ]
+        df_Q['s'] = [k[1] for k in self.Q.keys() ]
+        df_Q['Q'] = [v.X for v in self.Q.values() ]
+
+        df_R = pd.DataFrame()
+        df_R['j'] = [k[0] for k in self.R.keys() ]
+        df_R['s'] = [k[1] for k in self.R.keys() ]
+        df_R['R'] = [v.X for v in self.R.values() ]
+ 
+        df_L = pd.DataFrame()
+        df_L['j'] = [k[0] for k in self.L.keys() ]
+        df_L['s'] = [k[1] for k in self.L.keys() ]
+        df_L['L'] = [v.X for v in self.L.values() ]
+
+        df_rho = pd.DataFrame()
+        df_rho['j'] = [k[0] for k in self.rho.keys() ]
+        df_rho['s'] = [k[1] for k in self.rho.keys() ]
+        df_rho['rho'] = [v.X for v in self.rho.values() ]
+        df_rho = df_rho[df_rho['rho'] > 1e-4]
+
+        #df_lambd = pd.DataFrame()
+        #df_lambd['j'] = [k[0] for k in self.lambd.keys() ]
+        #df_lambd['s'] = [k[1] for k in self.lambd.keys() ]
+        #df_lambd['lambda'] = [v.X for v in self.lambd.values() ]
+
+        df_alpha = pd.DataFrame()
+        df_alpha['j'] = [k[0] for k in self.alpha.keys() ]
+        df_alpha['s'] = [k[1] for k in self.alpha.keys() ]
+        df_alpha['alpha'] = [v.X for v in self.alpha.values() ]
+        df_alpha = df_alpha[df_alpha['alpha'] > 1e-4]
+
+        with pd.ExcelWriter(filename) as writer:
+            df_gen.to_excel(writer, sheet_name="general", index=False)
+            df_x.to_excel(writer, sheet_name="x", index=False)
+            df_U.to_excel(writer, sheet_name="U", index=False)
+            df_TBar.to_excel(writer, sheet_name="TBar", index=False)
+            df_y.to_excel(writer, sheet_name="y", index=False)
+            df_Q.to_excel(writer, sheet_name="Q", index=False)
+            df_R.to_excel(writer, sheet_name="R", index=False)
+            df_L.to_excel(writer, sheet_name="L", index=False)
+            df_rho.to_excel(writer, sheet_name="rho", index=False)
+            #df_lambd.to_excel(writer, sheet_name="lambda", index=False)
+            df_alpha.to_excel(writer, sheet_name="alpha", index=False)     
+
+def toJson(mym : mymodel, inst : Instance):
+    sol = {}
+    #jsol = json.load(sol)
+    filename = 'results/' + inst.name + '.json'
+    with open (filename, 'w') as jsf:
+        json.dump(sol, jsf, indent=4)
+
+    return sol
 
 def load_instance(filename):
     #this will load instances

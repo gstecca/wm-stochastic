@@ -25,15 +25,16 @@ def build_model(inst : Instance):
     ZOB2 = (1/inst.LS) * gb.quicksum(inst.c[i,j] * y[i,j,s] for s in inst.S for i in range(1, inst.n+1) for j in inst.Vs if j != i)
     ZOB3 = (1/inst.LS) * gb.quicksum(inst.c[j,0] * alpha[j,s] for s in inst.S for j in inst.V1)
     ZOB4 = (1/inst.LS) * gb.quicksum(inst.p * R[j,s] for s in inst.S for j in range(inst.n + 1, inst.n + inst.m + 1) )
-    ZOB5 = (1/inst.LS) * gb.quicksum(inst.p * 2 * L[j,s] for s in inst.S for j in inst.V1)
+    ZOB5 = (1/inst.LS) * gb.quicksum(inst.p * L[j,s] for s in inst.S for j in inst.V1)
     ZOB = ZOB1 - ZOB2 + ZOB3 + ZOB4 + ZOB5
 
     if FIX_SOLUTION:
         dfxres = pd.read_excel('results/' + inst.name + "_mean_res.xlsx", sheet_name='x')
         for index, row in dfxres.iterrows():
             if row['x'] < 0.99:
-                continue
-            x[row['i'], row['j']].lb = 1
+                x[row['i'], row['j']].ub = 0
+            else:
+                x[row['i'], row['j']].lb = 1
     
 
     mm.setObjective(ZOB, GRB.MINIMIZE)
@@ -100,7 +101,7 @@ def run_model(inst : Instance, mym : mymodel):
     mm.Params.TimeLimit = max_runtime
     #mm.Params.IntFeasTol = 1e-7
     mm.optimize()
-    print('Optimizatoin ended with status (2=optimal, 3=infeasible, 5=inf_or_unbounded, 9=timlimit, 11=interrupted)', mm.Status)
+    print('Optimization ended with status (2=optimal, 3=infeasible, 5=inf_or_unbounded, 9=timlimit, 11=interrupted)', mm.Status)
 
 
 if __name__ == "__main__":

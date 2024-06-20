@@ -4,4 +4,4 @@ D2T = 1 # distance to time factor
 D2C = 1 # distance to cost factor
 WRITE_EDGES = False # if true write all edges to excel file
 WRITE_LP = False
-FIX_SOLUTION = False # if we have to read solution from other instance
+FIX_SOLUTION = True # if we have to read solution from other instance

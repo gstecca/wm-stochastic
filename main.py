@@ -8,6 +8,10 @@ import sys
 def build_model(inst : Instance):
     mym = mymodel()
     mm = gb.Model('FSG')
+    if LOWER_BOUND:
+        #inst.p = 0
+        #inst.delta ={k:0 for k in inst.delta}
+        pass
     x = {(i,j) : mm.addVar(vtype = GRB.BINARY, name='x_{}_{}'.format(i,j)) for i in inst.Vp for j in inst.Vs if i != j }
     U = {(j,t) : mm.addVar(vtype = GRB.BINARY, name='U_{}_{}'.format(j,t)) for j in inst.Vs for t in inst.T}
     TBar = {i : mm.addVar(vtype = GRB.CONTINUOUS, lb = 0, name = 'TBar_{}'.format(i)) for i in inst.V}
@@ -28,6 +32,14 @@ def build_model(inst : Instance):
     ZOB5 = (1/inst.LS) * gb.quicksum(inst.p * L[j,s] for s in inst.S for j in inst.V1)
     ZOB = ZOB1 - ZOB2 + ZOB3 + ZOB4 + ZOB5
 
+    # if LOWER_BOUND:
+    #    for i in inst.Vp:
+    #     for j in inst.Vs:
+    #         for s in inst.S:
+    #             if j!=i:
+    #                 y[i,j,s].ub = 0
+
+
     if FIX_SOLUTION:
         dfxres = pd.read_excel('results/' + inst.name + "_mean_res.xlsx", sheet_name='x')
         for index, row in dfxres.iterrows():
@@ -35,6 +47,13 @@ def build_model(inst : Instance):
                 x[row['i'], row['j']].ub = 0
             else:
                 x[row['i'], row['j']].lb = 1
+    if INIT_SOL:
+        dfxres = pd.read_excel('results/' + inst.name + "_res.xlsx", sheet_name='x')
+        for index, row in dfxres.iterrows():
+            if row['x'] < 0.99:
+                x[row['i'], row['j']].Start = 0
+            else:
+                x[row['i'], row['j']].Start = 1
     
 
     mm.setObjective(ZOB, GRB.MINIMIZE)
@@ -72,6 +91,11 @@ def build_model(inst : Instance):
 
     mm.addConstrs( (y[0,j,s] == 0 for s in inst.S for j in inst.Vs), name='cty0')
     mm.addConstrs(( alpha[j,s] == gb.quicksum(y[j,i,s] for i in inst.Vs if j!=i) - gb.quicksum(y[i,j,s] for i in range(1, inst.n+1) if j!=i)  for s in inst.S for j in range(1, inst.n + 1)), name = 'ctyalpha')
+
+    if VALID_INEQUALITIES:
+        mm.addConstr(  gb.quicksum(x[i,j] for i in inst.Vp for j in inst.Vs  if i != j  ) <= len(inst.V1) + inst.m, name="vi1.1" )
+        mm.addConstr(  gb.quicksum(x[i,j] for i in inst.Vp for j in inst.Vs  if i != j ) >= len(inst.V1) , name="vi1.2" )
+        mm.addConstrs( ( gb.quicksum( y[i,j,s] for i in inst.Vp for j in inst.Vs if j!=i ) -  gb.quicksum(rho[j,s] for j in range(1, inst.n + 1)  ) <= 0 for s in inst.S), name="vi2" )
     
     """
     mm.addConstr(x[0,1]==1)
@@ -106,7 +130,7 @@ def run_model(inst : Instance, mym : mymodel):
 
 if __name__ == "__main__":
     #inst_name = 'I1_S1_mean'
-    inst_name = 'I1_S8'
+    inst_name = 'I1_R1'
     if len(sys.argv) > 1:
         inst_name = sys.argv[1]
 

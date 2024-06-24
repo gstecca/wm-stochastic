@@ -26,6 +26,7 @@ class Instance:
         self.S = [1]
         self.C = 10
         self.p = 10
+        self.st = {} # service time in minutes
         self.Tmax = 10e6
         self.Qmax = 10e6
         self.M = 10e6
@@ -46,7 +47,7 @@ class Instance:
             for j in self.nodes.values():
                 dist = get_distance(i,j)
                 self.c[i.i, j.i] = dist * D2C
-                self.t[i.i, j.i] = dist * D2T
+                self.t[i.i, j.i] = dist * D2T + self.st[i]
                 self.e[i.i, j.i] = dist 
 
 
@@ -141,6 +142,7 @@ class mymodel:
     def to_excel(self, inst: Instance):
         filename = 'results/' + inst.name + "_res" 
         filename += '_fix.xlsx' if FIX_SOLUTION==True  else '.xlsx'
+        filename = filename[0:-5] +'_lb.xlsx' if  LOWER_BOUND==True  else filename[0:-5] +'.xlsx'
         # create a excel writer object
         df_gen = pd.DataFrame(columns=['param', 'value'])
         df_gen.loc[len(df_gen)] = ['Inst name', inst.name]
@@ -233,7 +235,7 @@ def toJson(mym : mymodel, inst : Instance):
 def load_instance(filename):
     #this will load instances
     dfp = pd.read_excel(filename, sheet_name='params', index_col='param')
-    dfn = pd.read_excel(filename, sheet_name='nodes')
+    dfn = pd.read_excel(filename, sheet_name='nodes', index_col='i')
     dfe = pd.read_excel(filename, sheet_name='edges', dtype={'i':int, 'j':int, 'c':float, 't':float})
     dftw = pd.read_excel(filename, sheet_name='time_windows')
     dfd = pd.read_excel(filename, sheet_name='demand')
@@ -253,15 +255,17 @@ def load_instance(filename):
     inst.Qmax = dfp.loc['Qmax','value']
     inst.M = dfp.loc['M','value']
 
-    if LOAD_NODES:
-        for index, row in dfn.iterrows():
-            inst.nodes[ row["i"] ] = node( row['i'], row["x"], row["y"])
+
+    for index, row in dfn.iterrows():
+            inst.nodes[ index ] = node(index, row["x"], row["y"])
+            inst.st[index] = row['service_time']
+    if not LOAD_EDGES:
         inst.fill_edges() 
-    else:
+    if LOAD_EDGES:
         for index, row in dfe.iterrows():
-            inst.e[ (row["i"], row["j"]) ] = row["c"]
+            inst.e[ (row["i"], row["j"]) ] = row["d"]
             inst.c[ (row["i"], row["j"]) ] = row["c"]
-            inst.t[ (row["i"], row["j"]) ] = row["t"] 
+            inst.t[ (row["i"], row["j"]) ] = row["t"] + inst.st[row['i']]
 
     for index, row in dftw.iterrows():
         inst.etw[ row['t']] =  row['e']

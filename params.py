@@ -1,5 +1,5 @@
-max_runtime = 60*5
-LOAD_EDGES = True # if true load edges. If false compute euclidian distances.
+max_runtime = 60*10
+LOAD_EDGES = False # if true load edges. If false compute euclidian distances.
 D2T = 1 # distance to time factor
 D2C = 1 # distance to cost factor
 WRITE_EDGES = False # if true write all edges to excel file

@@ -130,7 +130,7 @@ def run_model(inst : Instance, mym : mymodel):
 
 if __name__ == "__main__":
     #inst_name = 'I1_S1_mean'
-    inst_name = 'I1_R2'
+    inst_name = 'I1_S4'
     if len(sys.argv) > 1:
         inst_name = sys.argv[1]
 

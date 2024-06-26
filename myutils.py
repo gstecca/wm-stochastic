@@ -47,7 +47,7 @@ class Instance:
             for j in self.nodes.values():
                 dist = get_distance(i,j)
                 self.c[i.i, j.i] = dist * D2C
-                self.t[i.i, j.i] = dist * D2T + self.st[i]
+                self.t[i.i, j.i] = dist * D2T + self.st[j.i]
                 self.e[i.i, j.i] = dist 
 
 
@@ -265,7 +265,7 @@ def load_instance(filename):
         for index, row in dfe.iterrows():
             inst.e[ (row["i"], row["j"]) ] = row["d"]
             inst.c[ (row["i"], row["j"]) ] = row["c"]
-            inst.t[ (row["i"], row["j"]) ] = row["t"] + inst.st[row['i']]
+            inst.t[ (row["i"], row["j"]) ] = row["t"] + inst.st[row['i']] #TODO check if use j and not i
 
     for index, row in dftw.iterrows():
         inst.etw[ row['t']] =  row['e']

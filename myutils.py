@@ -2,7 +2,6 @@ import pandas as pd
 import math
 import json
 import gurobipy as gb
-from params import *
 
 class node:
     def __init__(self, i, x, y):
@@ -17,6 +16,7 @@ def get_distance(i: node, j: node):
 class Instance:
     def __init__(self):
         self.name = 'myname'
+        self.params = {}
         self.n = 1
         self.nodes = {} 
         self.LT = 1
@@ -46,8 +46,8 @@ class Instance:
         for i in self.nodes.values():
             for j in self.nodes.values():
                 dist = get_distance(i,j)
-                self.c[i.i, j.i] = dist * D2C
-                self.t[i.i, j.i] = dist * D2T + self.st[j.i]
+                self.c[i.i, j.i] = dist * self.params['D2C']
+                self.t[i.i, j.i] = dist * self.params['D2T'] + self.st[j.i]
                 self.e[i.i, j.i] = dist 
 
 
@@ -141,8 +141,8 @@ class mymodel:
 
     def to_excel(self, inst: Instance):
         filename = 'results/' + inst.name + "_res" 
-        filename += '_fix.xlsx' if FIX_SOLUTION==True  else '.xlsx'
-        filename = filename[0:-5] +'_lb.xlsx' if  LOWER_BOUND==True  else filename[0:-5] +'.xlsx'
+        filename += '_fix.xlsx' if inst.params['FIX_SOLUTION']==True  else '.xlsx'
+        filename = filename[0:-5] +'_lb.xlsx' if  inst.params['LOWER_BOUND']==True  else filename[0:-5] +'.xlsx'
         # create a excel writer object
         df_gen = pd.DataFrame(columns=['param', 'value'])
         df_gen.loc[len(df_gen)] = ['Inst name', inst.name]
@@ -232,7 +232,10 @@ def toJson(mym : mymodel, inst : Instance):
 
     return sol
 
-def load_instance(filename):
+def load_instance( params : dict):
+    inst_name = params['inst_name']
+    filename = 'instances/'+inst_name+'.xlsx'
+
     #this will load instances
     dfp = pd.read_excel(filename, sheet_name='params', index_col='param')
     dfn = pd.read_excel(filename, sheet_name='nodes', index_col='i')
@@ -242,7 +245,9 @@ def load_instance(filename):
     dfdelta = pd.read_excel(filename, sheet_name='delta')
     
     inst = Instance()
-    inst.name = dfp.loc['name','value']
+    inst.params = params
+    inst.name = inst_name
+    #inst.name = dfp.loc['name','value']
     inst.n = dfp.loc['n','value']
     inst.LT = dfp.loc['LT','value']
     inst.T = [t for t in range(1, inst.LT+1)]
@@ -258,10 +263,14 @@ def load_instance(filename):
 
     for index, row in dfn.iterrows():
             inst.nodes[ index ] = node(index, row["x"], row["y"])
-            inst.st[index] = row['service_time']
-    if not LOAD_EDGES:
+            try:
+                inst.st[index] = row['service_time']
+            except KeyError  as e:
+                inst.st[index] = 0
+
+    if not inst.params['LOAD_EDGES']:
         inst.fill_edges() 
-    if LOAD_EDGES:
+    if inst.params['LOAD_EDGES']:
         for index, row in dfe.iterrows():
             inst.e[ (row["i"], row["j"]) ] = row["d"]
             inst.c[ (row["i"], row["j"]) ] = row["c"]
@@ -279,7 +288,7 @@ def load_instance(filename):
 
     inst.fillV()
     inst.expandNetwork()
-    if WRITE_EDGES:
+    if inst.params['WRITE_EDGES']:
         df = pd.DataFrame(columns = ['i', 'j', 'c','t'])
         df['i'] = [k[0] for k, v in inst.e.items()]
         df['j'] = [k[1] for k, v in inst.e.items()]

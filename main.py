@@ -8,7 +8,7 @@ import sys
 def build_model(inst : Instance):
     mym = mymodel()
     mm = gb.Model('FSG')
-    if LOWER_BOUND:
+    if inst.params['LOWER_BOUND']:
         #inst.p = 0
         #inst.delta ={k:0 for k in inst.delta}
         pass
@@ -40,14 +40,14 @@ def build_model(inst : Instance):
     #                 y[i,j,s].ub = 0
 
 
-    if FIX_SOLUTION:
+    if inst.params['FIX_SOLUTION']:
         dfxres = pd.read_excel('results/' + inst.name + "_mean_res.xlsx", sheet_name='x')
         for index, row in dfxres.iterrows():
             if row['x'] < 0.99:
                 x[row['i'], row['j']].ub = 0
             else:
                 x[row['i'], row['j']].lb = 1
-    if INIT_SOL:
+    if inst.params['INIT_SOL']:
         dfxres = pd.read_excel('results/' + inst.name + "_res.xlsx", sheet_name='x')
         for index, row in dfxres.iterrows():
             if row['x'] < 0.99:
@@ -92,7 +92,7 @@ def build_model(inst : Instance):
     mm.addConstrs( (y[0,j,s] == 0 for s in inst.S for j in inst.Vs), name='cty0')
     mm.addConstrs(( alpha[j,s] == gb.quicksum(y[j,i,s] for i in inst.Vs if j!=i) - gb.quicksum(y[i,j,s] for i in range(1, inst.n+1) if j!=i)  for s in inst.S for j in range(1, inst.n + 1)), name = 'ctyalpha')
 
-    if VALID_INEQUALITIES:
+    if inst.params['VALID_INEQUALITIES']:
         mm.addConstr(  gb.quicksum(x[i,j] for i in inst.Vp for j in inst.Vs  if i != j  ) <= len(inst.V1) + inst.m, name="vi1.1" )
         mm.addConstr(  gb.quicksum(x[i,j] for i in inst.Vp for j in inst.Vs  if i != j ) >= len(inst.V1) , name="vi1.2" )
         mm.addConstrs( ( gb.quicksum( y[i,j,s] for i in inst.Vp for j in inst.Vs if j!=i ) -  gb.quicksum(rho[j,s] for j in range(1, inst.n + 1)  ) <= 0 for s in inst.S), name="vi2" )
@@ -113,7 +113,7 @@ def build_model(inst : Instance):
     """
     
     mm.update()
-    if (WRITE_LP):
+    if (inst.params['WRITE_LP']):
         mm.write('results/model_'+inst.name+'.lp')
 
     mym.set(mm, x, U, TBar, y, Q, R, L, rho, lambd, alpha, ZOB1, ZOB2, ZOB3, ZOB4, ZOB5)
@@ -122,21 +122,13 @@ def build_model(inst : Instance):
 
 def run_model(inst : Instance, mym : mymodel):
     mm = mym.m
-    mm.Params.TimeLimit = max_runtime
+    mm.Params.TimeLimit = inst.params['max_runtime']
     #mm.Params.IntFeasTol = 1e-7
     mm.optimize()
     print('Optimization ended with status (2=optimal, 3=infeasible, 5=inf_or_unbounded, 9=timlimit, 11=interrupted)', mm.Status)
 
-
-if __name__ == "__main__":
-    #inst_name = 'I1_S1_mean'
-    inst_name = 'I1_R1'
-    if len(sys.argv) > 1:
-        inst_name = sys.argv[1]
-
-    print("###### Processing Instance named: ", inst_name, '   #############')
-    filename = 'instances/'+inst_name+'.xlsx'
-    inst = load_instance(filename)
+def run(params : dict):
+    inst = load_instance(pms)
     print ("loaded instance with ", inst.n, ' nodes' )
     print (inst.to_string())
 
@@ -155,6 +147,48 @@ if __name__ == "__main__":
         print(mym.Z4.getValue())
         print(mym.Z5.getValue())
         fsolname = 'results/out_'+inst.name
-        fsolname += '_fix.sol' if FIX_SOLUTION==True  else '.sol'
+        fsolname += '_fix.sol' if inst.params['FIX_SOLUTION']==True  else '.sol'
         mym.m.write(fsolname)
         mym.to_excel(inst)
+
+
+if __name__ == "__main__":
+
+    inst_name = 'I2_S1_0'
+    if len(sys.argv) > 1:
+        inst_name = sys.argv[1]
+    fp = open('params.json')
+    pms = json.load(fp)
+
+    ###
+    # Run stochastic model
+    ###    
+
+    pms['inst_name'] = inst_name
+    pms['FIX_SOLUTION'] = False
+    print("###### Processing Instance named: ", inst_name, '   #############')
+    print("######  FIX SOLUTION:             ", pms['FIX_SOLUTION'], '#################')
+    run(pms)
+
+
+    ###
+    # Run average model
+    ### 
+    inst_name_mean = inst_name + '_mean'
+    pms['inst_name'] = inst_name_mean
+    pms['FIX_SOLUTION'] = False
+    print("###### Processing Instance named: ", inst_name, '   #############')
+    print("######  FIX SOLUTION:             ", pms['FIX_SOLUTION'], '#################')
+    run(pms)
+
+
+    ########
+    # Run FIXED MODEL  (EEV)
+    ########
+    pms['inst_name'] = inst_name
+    pms['FIX_SOLUTION'] = True
+    print("###### Processing Instance named: ", inst_name, '   #############')
+    print("######  FIX SOLUTION:             ", pms['FIX_SOLUTION'], '#################')
+    run(pms)
+
+

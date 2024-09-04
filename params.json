@@ -1,0 +1,11 @@
+{"max_runtime" : 600,
+"LOAD_EDGES" : false, 
+"D2T" : 1, 
+"D2C" : 1, 
+"WRITE_EDGES" : false, 
+"WRITE_LP" : false,
+"FIX_SOLUTION" : false,
+"INIT_SOL" : false, 
+"LOWER_BOUND" : false,
+"VALID_INEQUALITIES" : false,
+"PROVA_PARAM" : true}

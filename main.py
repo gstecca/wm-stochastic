@@ -154,7 +154,7 @@ def run(params : dict):
 
 if __name__ == "__main__":
 
-    inst_name = 'I2_S1_0'
+    inst_name = 'I2_S1_0_C100'
     if len(sys.argv) > 1:
         inst_name = sys.argv[1]
     fp = open('params.json')

@@ -130,25 +130,21 @@ def build_model_vrp(inst : Instance):
         #inst.p = 0
         #inst.delta ={k:0 for k in inst.delta}
         pass
+
     x = {(i,j) : mm.addVar(vtype = GRB.BINARY, name='x_{}_{}'.format(i,j)) for i in inst.Vp for j in inst.Vs if i != j }
+    mu = {(i,j) : mm.addVar(vtype = GRB.BINARY, name='x_{}_{}'.format(i,j)) for i in inst.Vp for j in inst.Vs if i != j }
+
     U = {(j,t) : mm.addVar(vtype = GRB.BINARY, name='U_{}_{}'.format(j,t)) for j in inst.Vs for t in inst.T}
     TBar = {i : mm.addVar(vtype = GRB.CONTINUOUS, lb = 0, name = 'TBar_{}'.format(i)) for i in inst.V}
-    y = {(i,j,s) :mm.addVar(vtype = GRB.BINARY, name = 'y_{}_{}_{}'.format(i,j,s)) for i in inst.Vp for j in inst.Vs for s in inst.S if j!=i }
     Q = {(j,s) : mm.addVar(vtype=  GRB.CONTINUOUS, lb = 0, name = 'Q_{}_{}'.format(j,s)) for j in inst.V for s in inst.S}
-    R = {(j,s) : mm.addVar(vtype=  GRB.CONTINUOUS, lb = 0, name = 'R_{}_{}'.format(j,s)) for j in range(inst.n+1, inst.n+inst.m+1) for s in inst.S}
-    L = {(j,s) : mm.addVar(vtype=  GRB.CONTINUOUS, lb = 0, name = 'L_{}_{}'.format(j,s)) for j in range(1, inst.n + 1) for s in inst.S}
-    rho = {(j,s) : mm.addVar(vtype=  GRB.BINARY,  name = 'rho_{}_{}'.format(j,s)) for j in range(1, inst.n + 1) for s in inst.S}
-    lambd = {(j,s) : mm.addVar(vtype=  GRB.BINARY,  name = 'lambd_{}_{}'.format(j,s)) for j in range(1, inst.n + 1) for s in inst.S}
-    alpha = {(j,s) : mm.addVar(vtype=  GRB.BINARY,  name = 'alpha_{}_{}'.format(j,s)) for j in range(1, inst.n + 1) for s in inst.S}
 
     mm.update()
 
+    K = 1000000
+
     ZOB1 = gb.quicksum(inst.c[i,j] * x[i,j] for i in inst.Vp for j in inst.Vs if j != i) 
-    ZOB2 = (1/inst.LS) * gb.quicksum(inst.c[i,j] * y[i,j,s] for s in inst.S for i in range(1, inst.n+1) for j in inst.Vs if j != i)
-    ZOB3 = (1/inst.LS) * gb.quicksum(inst.c[j,0] * alpha[j,s] for s in inst.S for j in inst.V1)
-    ZOB4 = (1/inst.LS) * gb.quicksum(inst.p * R[j,s] for s in inst.S for j in range(inst.n + 1, inst.n + inst.m + 1) )
-    ZOB5 = (1/inst.LS) * gb.quicksum(inst.p * L[j,s] for s in inst.S for j in inst.V1)
-    ZOB = ZOB1 - ZOB2 + ZOB3 + ZOB4 + ZOB5
+    ZOB2 = K * gb.quicksum(mu[j] for j in inst.Vp)
+    ZOB = ZOB1 - ZOB2 
 
     # if LOWER_BOUND:
     #    for i in inst.Vp:

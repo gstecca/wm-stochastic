@@ -4,16 +4,18 @@ import pandas as pd
 
 import os
 RUN = True
-SPECIFIC_INSTANCES = False
+SPECIFIC_INSTANCES = True
 Direc = "instances"
 files = os.listdir(Direc)
 # Filtering only the files.
 names = [f[0:-5] for f in files if os.path.isfile(Direc+'/'+f)]
 names = [n for n in names if n[-4:] != "mean"]
 names = sorted(names, reverse=True)
-print(*names, sep="\n")
+
 if SPECIFIC_INSTANCES:
-    names = ['I2_N10_T30_C200_0', 'I2_N10_T100_C200_0']
+    names = ['I2_N10_T30_C350_0', 'I2_N10_T100_C350_0', 'I2_N10_T100_C250_0', 'I2_N10_T30_C250_0']
+
+print(*names, sep="\n")
 
 if RUN:
     for name in names:
@@ -48,4 +50,4 @@ for name in names:
     DELTA = (objValueF - objValue)*100/objValue
     df.loc[len(df)] = [nInst, objValue, objValueF, DELTA, runTime, gap, Z1, Z2, Z3, Z4, Z5, 
                            Z1F, Z2F, Z3F, Z4F, Z5F]
-df.to_excel('table_results.xlsx')
+df.to_excel('table_results_new.xlsx')

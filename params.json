@@ -1,4 +1,4 @@
-{"max_runtime" : 43200,
+{"max_runtime" : 3600,
 "LOAD_EDGES" : false, 
 "D2T" : 1, 
 "D2C" : 1, 
@@ -8,4 +8,5 @@
 "INIT_SOL" : false, 
 "LOWER_BOUND" : false,
 "VALID_INEQUALITIES" : false,
+"POLICY" : "P0",
 "PROVA_PARAM" : true}

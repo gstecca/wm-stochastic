@@ -3,7 +3,8 @@ from os import listdir
 import pandas as pd
 
 import os
-RUN = False
+RUN = True
+SPECIFIC_INSTANCES = False
 Direc = "instances"
 files = os.listdir(Direc)
 # Filtering only the files.
@@ -11,7 +12,9 @@ names = [f[0:-5] for f in files if os.path.isfile(Direc+'/'+f)]
 names = [n for n in names if n[-4:] != "mean"]
 names = sorted(names, reverse=True)
 print(*names, sep="\n")
-#exit()
+if SPECIFIC_INSTANCES:
+    names = ['I2_N10_T30_C200_0', 'I2_N10_T100_C200_0']
+
 if RUN:
     for name in names:
         subprocess.run(['python', 'main.py', name])

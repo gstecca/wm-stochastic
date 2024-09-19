@@ -296,8 +296,10 @@ def run(params : dict):
 
 if __name__ == "__main__":
 
-    inst_names = ['I2_N7_T100_C140_0', 'I2_N7_T100_C210_0', 'I2_N7_T100_C280_0']
-    #inst_names = ['I2_N10_T30_C275_0', 'I2_N10_T30_C325_0','I2_N10_T100_C275_0', 'I2_N10_T30_C325_0' ]
+    #inst_names = ['I2_N7_T100_C140_0', 'I2_N7_T100_C210_0', 'I2_N7_T100_C280_0']
+    #inst_names = ['I2_N10_T30_C250_0', 'I2_N10_T30_C275_0', 'I2_N10_T30_C325_0','I2_N10_T100_C275_0', 'I2_N10_T100_C325_0' ]
+    inst_names = ['I2_N10_T30_C400_0','I2_N10_T30_C350_0','I2_N10_T30_C325_0','I2_N10_T30_C300_0','I2_N10_T30_C275_0','I2_N10_T100_C400_0',
+              'I2_N10_T100_C350_0', 'I2_N10_T100_C325_0', 'I2_N10_T100_C300_0', 'I2_N10_T100_C275_0']
     for inst_name in inst_names:  #'I2_S1_0_C100'
         if len(sys.argv) > 1:
             inst_name = sys.argv[1]

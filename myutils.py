@@ -54,8 +54,8 @@ class Instance:
     def fillV(self):
         self.V = set(i for i in range(self.n+self.m+1))
         self.V1 = set(i for i in range(1, self.n + 1))
-        self.Vp = set.difference(self.V, set(i for i in range(self.n+1, self.n+self.m+1)))
-        self.Vs =  set.difference(self.V, {0})
+        self.Vp = set.difference(self.V, set(i for i in range(self.n+1, self.n+self.m+1))) #V'   {0, ... n}
+        self.Vs =  set.difference(self.V, {0})                                             # V'' {1, ... n, n+1,,n+m}
         return
     
     def expandNetwork(self):
@@ -121,7 +121,8 @@ class mymodel:
         self.Z2 = None
         self.Z3 = None
         self.Z4 = None
-    def set(self, m, x, U, TBar, y, Q, R, L, rho, lambd, alpha, Z1, Z2, Z3, Z4, Z5):
+        self.MODEL_TYPE = 'STOCHASTIC' # STOCHASTIC, POLICY
+    def set(self, m, x, U, TBar, y, Q, R, L, rho, lambd, alpha, Z1, Z2, Z3, Z4, Z5, type):
         self.m = m
         self.x = x
         self.U = U
@@ -138,9 +139,14 @@ class mymodel:
         self.Z3 = Z3
         self.Z4 = Z4
         self.Z5 = Z5
+        self.MODEL_TYPE = type
 
     def to_excel(self, inst: Instance):
-        filename = 'results/' + inst.name + "_res" 
+        policy = inst.params['POLICY']
+        if policy == 'P0':
+            filename = 'results/' + inst.name + "_res" 
+        else: 
+            filename = 'results/' + inst.name + "_" + policy + "_res"
         filename += '_fix.xlsx' if inst.params['FIX_SOLUTION']==True  else '.xlsx'
         filename = filename[0:-5] +'_lb.xlsx' if  inst.params['LOWER_BOUND']==True  else filename[0:-5] +'.xlsx'
         # create a excel writer object

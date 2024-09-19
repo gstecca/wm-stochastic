@@ -3,8 +3,9 @@ from os import listdir
 import pandas as pd
 
 import os
-RUN = True
-SPECIFIC_INSTANCES = True
+RUN = False
+SPECIFIC_INSTANCES = False
+POLICIES = True
 Direc = "instances"
 files = os.listdir(Direc)
 # Filtering only the files.
@@ -13,7 +14,15 @@ names = [n for n in names if n[-4:] != "mean"]
 names = sorted(names, reverse=True)
 
 if SPECIFIC_INSTANCES:
-    names = ['I2_N10_T30_C350_0', 'I2_N10_T100_C350_0', 'I2_N10_T100_C250_0', 'I2_N10_T30_C250_0']
+    names = ['I2_N5_T30_C100_0', 'I2_N5_T30_C150_0', 'I2_N5_T30_C200_0', 'I2_N5_T100_C100_0', 'I2_N5_T100_C150_0', 'I2_N5_T100_C200_0',]
+
+if POLICIES:
+    nplus = []
+    for n in names:
+        nplus.append(n)
+        for p in ['P0', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6']:
+            nplus.append(n + "_" + p)
+    names = nplus
 
 print(*names, sep="\n")
 
@@ -50,4 +59,4 @@ for name in names:
     DELTA = (objValueF - objValue)*100/objValue
     df.loc[len(df)] = [nInst, objValue, objValueF, DELTA, runTime, gap, Z1, Z2, Z3, Z4, Z5, 
                            Z1F, Z2F, Z3F, Z4F, Z5F]
-df.to_excel('table_results_new.xlsx')
+df.to_excel('table_results_policies.xlsx')

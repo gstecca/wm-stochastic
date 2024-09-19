@@ -14,8 +14,8 @@ names = [n for n in names if n[-4:] != "mean"]
 names = sorted(names, reverse=True)
 
 if SPECIFIC_INSTANCES:
-    names = ['I2_N5_T30_C100_0', 'I2_N5_T30_C150_0', 'I2_N5_T30_C200_0', 'I2_N5_T100_C100_0', 'I2_N5_T100_C150_0', 'I2_N5_T100_C200_0',]
-
+    names = ['I2_N5_T30_C100_0', 'I2_N5_T30_C150_0', 'I2_N5_T30_C200_0', 'I2_N5_T100_C100_0', 'I2_N5_T100_C150_0', 'I2_N5_T100_C200_0',
+    'I2_N7_T30_C140_0', 'I2_N7_T30_C210_0', 'I2_N7_T30_C280_0','I2_N7_T100_C140_0', 'I2_N7_T100_C210_0', 'I2_N7_T100_C280_0']
 if POLICIES:
     nplus = []
     for n in names:

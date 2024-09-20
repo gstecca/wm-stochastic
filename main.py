@@ -139,13 +139,13 @@ def build_model_vrp(inst : Instance):
 
     if policy == 'P1':
         pass
-    if policy == 'P2' or policy == 'P4' or policy == 'P5' or policy == 'P6':
+    if policy == 'P2' or policy == 'P4' or policy == 'P5' or policy == 'P6' or policy == 'P7':
         for j in range(1, inst.n + 1):
             mean = 0
             for s in inst.S:  
                 for t in inst.T:
                     mean += inst.delta[j,t,s]
-            mean = mean/(inst.LS*inst.LT)
+            mean = mean/inst.LS
             d[j] = d[j] + mean
 
     if policy == 'P3':
@@ -164,6 +164,8 @@ def build_model_vrp(inst : Instance):
         pass
     if policy == 'P6':
         pass
+    if policy == 'P7':
+        C = C*(0.9)
 
     
     
@@ -298,8 +300,10 @@ if __name__ == "__main__":
 
     #inst_names = ['I2_N7_T100_C140_0', 'I2_N7_T100_C210_0', 'I2_N7_T100_C280_0']
     #inst_names = ['I2_N10_T30_C250_0', 'I2_N10_T30_C275_0', 'I2_N10_T30_C325_0','I2_N10_T100_C275_0', 'I2_N10_T100_C325_0' ]
-    inst_names = ['I2_N10_T30_C400_0','I2_N10_T30_C350_0','I2_N10_T30_C325_0','I2_N10_T30_C300_0','I2_N10_T30_C275_0','I2_N10_T100_C400_0',
-              'I2_N10_T100_C350_0', 'I2_N10_T100_C325_0', 'I2_N10_T100_C300_0', 'I2_N10_T100_C275_0']
+    inst_names = ['I2_N7_T30_C280_0', 'I2_N7_T30_C210_0', 'I2_N7_T30_C140_0', 'I2_N7_T100_C280_0', 'I2_N7_T100_C210_0', 'I2_N7_T100_C140_0', 
+                   'I2_N5_T30_C200_0', 'I2_N5_T30_C150_0', 'I2_N5_T30_C100_0', 'I2_N5_T100_C200_0', 'I2_N5_T100_C150_0', 'I2_N5_T100_C100_0', 
+                   'I2_N10_T30_C400_0', 'I2_N10_T30_C350_0', 'I2_N10_T30_C325_0', 'I2_N10_T30_C300_0', 'I2_N10_T30_C275_0', 'I2_N10_T100_C400_0', 
+                   'I2_N10_T100_C350_0', 'I2_N10_T100_C325_0', 'I2_N10_T100_C300_0', 'I2_N10_T100_C275_0']
     for inst_name in inst_names:  #'I2_S1_0_C100'
         if len(sys.argv) > 1:
             inst_name = sys.argv[1]
@@ -307,7 +311,8 @@ if __name__ == "__main__":
         pms = json.load(fp)
 
         if pms['MODEL_TYPE'] == "POLICY":
-            policies = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
+            policies = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7']
+            policies = ['P7']
             pms['inst_name'] = inst_name
             pms['FIX_SOLUTION'] = False
             inst = load_instance(pms)

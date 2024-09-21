@@ -132,14 +132,14 @@ def build_model_vrp(inst : Instance):
     mym = mymodel()
     mm = gb.Model('FSG')
     policy = inst.params['POLICY']
-    capResize = 0.2
+    capResize = 0.1
 
     d = {k:v for k,v in inst.d.items()}
     C = inst.C
 
     if policy == 'P1':
         pass
-    if policy == 'P2' or policy == 'P4' or policy == 'P5' or policy == 'P6' or policy == 'P7':
+    if policy == 'P2' or policy == 'P4' or policy == 'P5' or policy == 'P6':
         for j in range(1, inst.n + 1):
             mean = 0
             for s in inst.S:  
@@ -164,8 +164,6 @@ def build_model_vrp(inst : Instance):
         pass
     if policy == 'P6':
         pass
-    if policy == 'P7':
-        C = C*(0.9)
 
     
     
@@ -311,8 +309,7 @@ if __name__ == "__main__":
         pms = json.load(fp)
 
         if pms['MODEL_TYPE'] == "POLICY":
-            policies = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7']
-            policies = ['P7']
+            policies = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
             pms['inst_name'] = inst_name
             pms['FIX_SOLUTION'] = False
             inst = load_instance(pms)

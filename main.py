@@ -133,6 +133,7 @@ def build_model_vrp(inst : Instance):
     mm = gb.Model('FSG')
     policy = inst.params['POLICY']
     capResize = 0.1
+    capResizeP5 = 0.15
 
     d = {k:v for k,v in inst.d.items()}
     C = inst.C
@@ -225,7 +226,7 @@ def build_model_vrp(inst : Instance):
     #mm.addConstrs((Q[j] - Q[i] - inst.M * (1 - x[i,j]) <= 0 for i in inst.Vp for j in range(inst.n + 1, inst.n + inst.m + 1)), name = 'ct11_new')
     
     if policy == 'P5':
-        f = {j : capResize if j%2 == 0 else -capResize for j in inst.V}
+        f = {j : capResizeP5 if j%2 == 0 else -capResizeP5 for j in inst.V}
         mm.addConstrs((Q[j] <= C*(1 + f[j]) + mu[j] for j in inst.V), name = 'ctcap')
     else:
         mm.addConstrs((Q[j] <= C + mu[j] for j in inst.V), name = 'ctcap')
@@ -302,6 +303,7 @@ if __name__ == "__main__":
                    'I2_N5_T30_C200_0', 'I2_N5_T30_C150_0', 'I2_N5_T30_C100_0', 'I2_N5_T100_C200_0', 'I2_N5_T100_C150_0', 'I2_N5_T100_C100_0', 
                    'I2_N10_T30_C400_0', 'I2_N10_T30_C350_0', 'I2_N10_T30_C325_0', 'I2_N10_T30_C300_0', 'I2_N10_T30_C275_0', 'I2_N10_T100_C400_0', 
                    'I2_N10_T100_C350_0', 'I2_N10_T100_C325_0', 'I2_N10_T100_C300_0', 'I2_N10_T100_C275_0']
+    inst_names = ['I1_RTSL']
     for inst_name in inst_names:  #'I2_S1_0_C100'
         if len(sys.argv) > 1:
             inst_name = sys.argv[1]

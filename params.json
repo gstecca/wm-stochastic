@@ -1,5 +1,5 @@
 {"max_runtime" : 3600,
-"LOAD_EDGES" : false, 
+"LOAD_EDGES" : true, 
 "D2T" : 1, 
 "D2C" : 1, 
 "WRITE_EDGES" : false, 
@@ -9,6 +9,6 @@
 "LOWER_BOUND" : false,
 "VALID_INEQUALITIES" : false,
 "POLICY" : "P0",
-"MODEL_TYPE" : "POLICY",
+"MODEL_TYPE" : "STOCHASTIC",
 "XFIX" : {},
 "PROVA_PARAM" : true}

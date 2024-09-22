@@ -51,4 +51,4 @@ for name in names:
     Z5 = dfres.loc['Z5']['value']
 
     df.loc[len(df)] = [nInst, objValue, runTime, gap, Z1, Z2, Z3, Z4, Z5]
-df.to_excel('table_results_policies.xlsx')
+df.to_excel('table_results_policies_all.xlsx')

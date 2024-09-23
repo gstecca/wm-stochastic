@@ -1,5 +1,5 @@
 {"max_runtime" : 3600,
-"LOAD_EDGES" : true, 
+"LOAD_EDGES" : false, 
 "D2T" : 1, 
 "D2C" : 1, 
 "WRITE_EDGES" : false, 

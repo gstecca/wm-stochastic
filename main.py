@@ -304,6 +304,9 @@ if __name__ == "__main__":
                    'I2_N10_T30_C400_0', 'I2_N10_T30_C350_0', 'I2_N10_T30_C325_0', 'I2_N10_T30_C300_0', 'I2_N10_T30_C275_0', 'I2_N10_T100_C400_0', 
                    'I2_N10_T100_C350_0', 'I2_N10_T100_C325_0', 'I2_N10_T100_C300_0', 'I2_N10_T100_C275_0']
     inst_names = ['I1_RTSL']
+    inst_names = ['I1_R2']
+    inst_names = ['I2_N7_T30_C100_0', 'I2_N7_T30_C120_0']
+    inst_names = ['I2_N7_T100_C100_0', 'I2_N7_T100_C120_0', 'I2_N7_T100_C120_0']
     for inst_name in inst_names:  #'I2_S1_0_C100'
         if len(sys.argv) > 1:
             inst_name = sys.argv[1]

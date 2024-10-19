@@ -290,7 +290,7 @@ def run(params : dict):
         print(mym.Z5.getValue())
         fsolname = 'results/out_'+inst.name
         fsolname += '_fix.sol' if inst.params['FIX_SOLUTION']==True  else '.sol'
-        mym.m.write(fsolname)
+        #mym.m.write(fsolname)
         mym.to_excel(inst)
     return mym
 
@@ -307,9 +307,14 @@ if __name__ == "__main__":
     inst_names = ['I1_R2']
     inst_names = ['I2_N7_T30_C100_0', 'I2_N7_T30_C120_0']
     inst_names = ['I2_N7_T100_C100_0', 'I2_N7_T100_C120_0', 'I2_N7_T100_C120_0']
+    inst_names = ['I2_N10_T100_C400_0']
+    dfi = pd.read_excel('instances_list.xlsx', index_col='name')
+    inst_names = list(dfi.index)
+    counter = 0
     for inst_name in inst_names:  #'I2_S1_0_C100'
         if len(sys.argv) > 1:
             inst_name = sys.argv[1]
+        print(f'*********************************SOLVING INSTANCE {inst_name}******************\n***************************************************')
         fp = open('params.json')
         pms = json.load(fp)
 
@@ -374,7 +379,7 @@ if __name__ == "__main__":
             pms['FIX_SOLUTION'] = False
             print("###### Processing Instance named: ", inst_name, '   #############')
             print("######  FIX SOLUTION:             ", pms['FIX_SOLUTION'], '#################')
-            run(pms)
+            myms = run(pms)
 
 
             ###
@@ -395,6 +400,30 @@ if __name__ == "__main__":
             pms['FIX_SOLUTION'] = True
             print("###### Processing Instance named: ", inst_name, '   #############')
             print("######  FIX SOLUTION:             ", pms['FIX_SOLUTION'], '#################')
-            run(pms)
+            mymf = mym = run(pms)
+            dfi.loc[inst_name, 'solved'] = True
+            dfi.loc[inst_name, 'objVal'] = myms.m.ObjVal #
+            dfi.loc[inst_name, 'runTime'] = myms.m.Runtime
+            dfi.loc[inst_name,'gap']= myms.m.MIPGap
+            dfi.loc[inst_name,'Z1'] =  myms.Z1.getValue()
+            dfi.loc[inst_name,'Z2'] =  myms.Z2.getValue()
+            dfi.loc[inst_name,'Z3'] =  myms.Z3.getValue()
+            dfi.loc[inst_name,'Z4'] =  myms.Z4.getValue()
+            dfi.loc[inst_name,'Z5'] =  myms.Z5.getValue()
+            dfi.loc[inst_name,'EEV']=  mymf.m.MIPGap
+            dfi.loc[inst_name,'EZ1'] =  mymf.Z1.getValue()
+            dfi.loc[inst_name,'EZ2'] =  mymf.Z2.getValue()
+            dfi.loc[inst_name,'EZ3'] =  mymf.Z3.getValue()
+            dfi.loc[inst_name,'EZ4'] =  mymf.Z4.getValue()
+            dfi.loc[inst_name,'EZ5'] =  mymf.Z5.getValue()
+            dfi.to_excel('instances_list.xlsx')
+            with open('log_table.csv', 'a') as mylog:
+                mylog.write(inst_name +',')
+                for c in dfi.columns:
+                    mylog.write(str(dfi.loc[inst_name][c]))
+                    mylog.write(',')
+                mylog.write('\n')
+    
+    
 
 

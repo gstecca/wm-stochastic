@@ -16,7 +16,7 @@ if SPECIFIC_INSTANCES:
     #names = ['I2_N10_T30_C275_0', 'I2_N10_T30_C325_0','I2_N10_T100_C275_0', 'I2_N10_T100_C325_0']
     #names = ['I2_N10_T100_C325_0']
     names = ['I2_N7_T30_C100_0', 'I2_N7_T30_C120_0', 'I2_N7_T30_C120_0']
-    names = ['I2_N7_T100_C100_0', 'I2_N7_T100_C120_0', 'I2_N7_T100_C120_0']
+    names = ['I2_N7_T100_C100_0', 'I2_N7_T100_C120_0', 'I2_N7_T100_C140_0']
     
 
 print(*names, sep="\n")

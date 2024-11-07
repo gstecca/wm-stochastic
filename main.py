@@ -3,6 +3,7 @@ import gurobipy as gb
 from gurobipy import GRB
 import sys
 import math
+import os
 
 
 
@@ -183,6 +184,12 @@ def build_model_vrp(inst : Instance):
     u = {}
     if policy == 'P6':
         u = {j : mm.addVar(vtype=GRB.INTEGER, lb=0, name = 'u_{}'.format(j)) for j in inst.V }
+    
+    # add a variable zero in order to get rid of no value for the z3,z4,z5 components of the obj f
+    zero = mm.addVar(vtype=GRB.CONTINUOUS, name='zero')
+    Z_Zero = 1*zero
+    mm.addConstr(zero == 0, name='ctzero')
+    
 
 
     mm.update()
@@ -257,9 +264,9 @@ def build_model_vrp(inst : Instance):
     if (inst.params['WRITE_LP']):
         mm.write('results/model_'+inst.name+'_'+ policy +'.lp')
     if policy != 'P6':
-        mym.set(mm, x, U, TBar, None, Q, None, None, None, None, None, ZOB1, ZOB2, 0, 0, 0, 'POLICY')
+        mym.set(mm, x, U, TBar, None, Q, None, None, None, None, None, ZOB1, ZOB2, Z_Zero, Z_Zero, Z_Zero, 'POLICY')
     else:
-            mym.set(mm, x, U, TBar, None, Q, None, None, None, None, None, ZOB, 0, 0, 0, 0, 'POLICY')
+        mym.set(mm, x, U, TBar, None, Q, None, None, None, None, None, ZOB, Z_Zero, Z_Zero, Z_Zero, Z_Zero, 'POLICY')
     return mym
 
 def run_model(inst : Instance, mym : mymodel):
@@ -311,6 +318,13 @@ if __name__ == "__main__":
     dfi = pd.read_excel('instances_list.xlsx', index_col='name')
     inst_names = list(dfi.index)
     counter = 0
+    if not os.path.isfile('log_table_policies.csv'):
+        with open('log_table_policies.csv', 'a') as mylog:
+                        mylog.write('name,solved,type,objval,runtime,gap,Z1,Z2,Z3,Z4,Z5,SObjVal,SZ1,SZ2,SZ3,SZ4,SZ5\n')
+    if not os.path.isfile('log_table_policies_p.csv'):
+        with open('log_table_policies_p.csv', 'a') as mylog:
+                        mylog.write('name,solved,type,objval,runtime_p,gap_p,Z1_p,Z2_p,Z3_p,Z4_p,Z5_p,FixObjVal,FixZ1,FixZ2,FixZ3,FixZ4,FixZ5\n')
+    dfpolicies = pd.read_csv('log_table_policies.csv', index_col=['name', 'type'])
     for inst_name in inst_names:  #'I2_S1_0_C100'
         if len(sys.argv) > 1:
             inst_name = sys.argv[1]
@@ -319,6 +333,12 @@ if __name__ == "__main__":
         pms = json.load(fp)
 
         if pms['MODEL_TYPE'] == "POLICY":
+            ssolved = dfi.loc[inst_name, 'solved']
+            if not ssolved:
+                with open('log_table_policies.csv', 'a') as mylog:
+                    mylog.write(f'{inst_name},{ssolved},,,,,,,,,,,,,,,\n')
+                    continue
+
             policies = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
             pms['inst_name'] = inst_name
             pms['FIX_SOLUTION'] = False
@@ -330,19 +350,23 @@ if __name__ == "__main__":
             for p in policies:
 
                 ###
-                # Run POLICY
-                ###    
+                # Run POLICY if not already in log_table_polices
+                ###
+
+                if (inst_name, p) in dfpolicies.index:
+                    continue
+                #dfpolicies.loc[name, 'P1']['solved']     
                 
                 print("###### Processing Instance named: ", inst_name, '   #############')
                 print("######  POLICY:             ", p, '#################')
                 print("building model")
                 pms['POLICY'] = p
-                mym = build_model(inst)
+                mymp = build_model(inst)
 
                 print(f"run model with policy {p}")
-                run_model(inst, mym)
+                run_model(inst, mymp)
                 # take the x solution
-                xfix = {(k[0],k[1]): v.x for k,v in mym.x.items()}
+                xfix = {(k[0],k[1]): v.X for k,v in mymp.x.items()}
                 # set the stochastic model with fix x
                 pms['POLICY'] = 'P0'
                 pms['XFIX'] = xfix
@@ -367,7 +391,20 @@ if __name__ == "__main__":
                     pms['POLICY'] = p
                     mym.to_excel(inst)
 
-                    # reset x solution in order to pass to the next policy
+                    #
+                    # WRITE AGGREGATED RESULT APPENDED ON INSTANCE LIST FILES
+                    #
+                    # name,solved,type,objval,runtime,gap,Z1,Z2,Z3,Z4,Z5,SObjVal,SZ1,SZ2,SZ3,SZ4,SZ5
+                    row = f"{inst_name},{True},{p},{mym.m.ObjVal},{mym.m.Runtime},{mym.m.MIPGap},{mym.Z1.getValue()},{mym.Z2.getValue()},{mym.Z3.getValue()},{mym.Z4.getValue()},{mym.Z5.getValue()},{dfi.loc[inst_name, 'objVal']},{dfi.loc[inst_name,'Z1']},{dfi.loc[inst_name,'Z2']},{dfi.loc[inst_name,'Z3']},{dfi.loc[inst_name,'Z4']},{dfi.loc[inst_name,'Z5']}"
+                    # name,solved,type,objval,runtime_p,gap_p,Z1_p,Z2_p,Z3_p,Z4_p,Z5_p,FixObjVal,FixZ1,FixZ2,FixZ3,FixZ4,FixZ5
+                    rowp = f"{inst_name},{True},{p},{mymp.m.ObjVal},{mymp.m.Runtime},{mymp.m.MIPGap},{mymp.Z1.getValue()},{mymp.Z2.getValue()},{mymp.Z3.getValue()},{mymp.Z4.getValue()},{mymp.Z5.getValue()},{mym.m.ObjVal},{mym.m.Runtime},{mym.m.MIPGap},{mym.Z1.getValue()},{mym.Z2.getValue()},{mym.Z3.getValue()},{mym.Z4.getValue()},{mym.Z5.getValue()}"
+
+                    with open('log_table_policies.csv', 'a') as mylog:
+                        mylog.write(row + '\n')
+                    with open('log_table_policies_p.csv', 'a') as mylog:
+                        mylog.write(rowp + '\n')
+
+                # reset x solution in order to pass to the next policy
                 pms['XFIX'] = {}
         
         else:
@@ -381,6 +418,11 @@ if __name__ == "__main__":
             print("######  FIX SOLUTION:             ", pms['FIX_SOLUTION'], '#################')
             myms = run(pms)
 
+            if myms.m.Status not in [2,9,11]:
+                with open('log_table.csv', 'a') as mylog:
+                    mylog.write(inst_name +',True,INFEASIBLE\n ')
+
+
 
             ###
             # Run average model
@@ -390,8 +432,7 @@ if __name__ == "__main__":
             pms['FIX_SOLUTION'] = False
             print("###### Processing Instance named: ", inst_name, '   #############')
             print("######  FIX SOLUTION:             ", pms['FIX_SOLUTION'], '#################')
-            run(pms)
-
+            myma = run(pms)
 
             ########
             # Run FIXED MODEL  (EEV)
@@ -400,7 +441,10 @@ if __name__ == "__main__":
             pms['FIX_SOLUTION'] = True
             print("###### Processing Instance named: ", inst_name, '   #############')
             print("######  FIX SOLUTION:             ", pms['FIX_SOLUTION'], '#################')
-            mymf = mym = run(pms)
+            if myma.m.Status in [2,9,11]:    
+                mymf = run(pms)
+            else:
+                continue
             dfi.loc[inst_name, 'solved'] = True
             dfi.loc[inst_name, 'objVal'] = myms.m.ObjVal #
             dfi.loc[inst_name, 'runTime'] = myms.m.Runtime
@@ -410,12 +454,14 @@ if __name__ == "__main__":
             dfi.loc[inst_name,'Z3'] =  myms.Z3.getValue()
             dfi.loc[inst_name,'Z4'] =  myms.Z4.getValue()
             dfi.loc[inst_name,'Z5'] =  myms.Z5.getValue()
-            dfi.loc[inst_name,'EEV']=  mymf.m.MIPGap
+            dfi.loc[inst_name,'EVV']=  mymf.m.ObjVal
             dfi.loc[inst_name,'EZ1'] =  mymf.Z1.getValue()
             dfi.loc[inst_name,'EZ2'] =  mymf.Z2.getValue()
             dfi.loc[inst_name,'EZ3'] =  mymf.Z3.getValue()
             dfi.loc[inst_name,'EZ4'] =  mymf.Z4.getValue()
             dfi.loc[inst_name,'EZ5'] =  mymf.Z5.getValue()
+            dfi.loc[inst_name,'VSS']=  (mymf.m.ObjVal - myms.m.ObjVal)/myms.m.ObjVal
+
             dfi.to_excel('instances_list.xlsx')
             with open('log_table.csv', 'a') as mylog:
                 mylog.write(inst_name +',')

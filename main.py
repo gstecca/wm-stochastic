@@ -201,8 +201,8 @@ def build_model_vrp(inst : Instance):
         ZOB = gb.quicksum((1/inst.t[0,j])*u[j] for j in inst.V1 )
     else:
         ZOB1 = gb.quicksum(inst.c[i,j] * x[i,j] for i in inst.Vp for j in inst.Vs if j != i) 
-        ZOB2 = K * gb.quicksum(mu[j] for j in inst.V)
-        ZOB = ZOB1 + ZOB2 
+        #ZOB2 = K * gb.quicksum(mu[j] for j in inst.V)
+        ZOB = ZOB1 # + ZOB2 
 
     # if LOWER_BOUND:
     #    for i in inst.Vp:
@@ -264,7 +264,7 @@ def build_model_vrp(inst : Instance):
     if (inst.params['WRITE_LP']):
         mm.write('results/model_'+inst.name+'_'+ policy +'.lp')
     if policy != 'P6':
-        mym.set(mm, x, U, TBar, None, Q, None, None, None, None, None, ZOB1, ZOB2, Z_Zero, Z_Zero, Z_Zero, 'POLICY')
+        mym.set(mm, x, U, TBar, None, Q, None, None, None, None, None, ZOB1, Z_Zero, Z_Zero, Z_Zero, Z_Zero, 'POLICY')
     else:
         mym.set(mm, x, U, TBar, None, Q, None, None, None, None, None, ZOB, Z_Zero, Z_Zero, Z_Zero, Z_Zero, 'POLICY')
     return mym
@@ -325,7 +325,7 @@ if __name__ == "__main__":
         with open('log_table_policies_p.csv', 'a') as mylog:
                         mylog.write('name,solved,type,objval,runtime_p,gap_p,Z1_p,Z2_p,Z3_p,Z4_p,Z5_p,FixObjVal,FixZ1,FixZ2,FixZ3,FixZ4,FixZ5\n')
     dfpolicies = pd.read_csv('log_table_policies.csv', index_col=['name', 'type'])
-    for inst_name in inst_names:  #'I2_S1_0_C100'
+    for inst_name in ['I3_N5_M2_T15_C100_DepLowerLeft_s0']:  #'I2_S1_0_C100' inst_names
         if len(sys.argv) > 1:
             inst_name = sys.argv[1]
         print(f'*********************************SOLVING INSTANCE {inst_name}******************\n***************************************************')

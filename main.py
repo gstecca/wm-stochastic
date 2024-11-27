@@ -325,7 +325,7 @@ if __name__ == "__main__":
         with open('log_table_policies_p.csv', 'a') as mylog:
                         mylog.write('name,solved,type,objval,runtime_p,gap_p,Z1_p,Z2_p,Z3_p,Z4_p,Z5_p,FixObjVal,FixZ1,FixZ2,FixZ3,FixZ4,FixZ5\n')
     dfpolicies = pd.read_csv('log_table_policies.csv', index_col=['name', 'type'])
-    for inst_name in ['I3_N5_M2_T15_C100_DepLowerLeft_s0']:  #'I2_S1_0_C100' inst_names
+    for inst_name in inst_names: # ['I3_N5_M2_T15_C100_DepLowerLeft_s0']:  #'I2_S1_0_C100' inst_names
         if len(sys.argv) > 1:
             inst_name = sys.argv[1]
         print(f'*********************************SOLVING INSTANCE {inst_name}******************\n***************************************************')
@@ -361,7 +361,7 @@ if __name__ == "__main__":
                 print("######  POLICY:             ", p, '#################')
                 print("building model")
                 pms['POLICY'] = p
-                mymp = build_model(inst)
+                mymp = build_model(inst)  # modello policy
 
                 print(f"run model with policy {p}")
                 run_model(inst, mymp)
@@ -372,7 +372,7 @@ if __name__ == "__main__":
                 pms['XFIX'] = xfix
                 # build the stochastic model with P0 and x fix
                 print("INNEST X SOLUTION OF " + p + " POLICY INTO STOCHASTIC MODEL AND SOLVE IT")
-                mym = build_model(inst)
+                mym = build_model(inst) # modello fixed
                 print(f"run model with policy {p}")
                 run_model(inst, mym)
 
@@ -384,9 +384,9 @@ if __name__ == "__main__":
                     print(mym.Z3.getValue())
                     print(mym.Z4.getValue())
                     print(mym.Z5.getValue())
-                    fsolname = 'results/out_'+inst.name
-                    fsolname += '_fix.sol' if inst.params['FIX_SOLUTION']==True  else '.sol'
-                    mym.m.write(fsolname)
+                    #fsolname = 'results/out_'+inst.name
+                    #fsolname += '_fix.sol' if inst.params['FIX_SOLUTION']==True  else '.sol'
+                    #mym.m.write(fsolname)
                     # reset the current policy in order to write it to disk as filename
                     pms['POLICY'] = p
                     mym.to_excel(inst)
@@ -397,7 +397,7 @@ if __name__ == "__main__":
                     # name,solved,type,objval,runtime,gap,Z1,Z2,Z3,Z4,Z5,SObjVal,SZ1,SZ2,SZ3,SZ4,SZ5
                     row = f"{inst_name},{True},{p},{mym.m.ObjVal},{mym.m.Runtime},{mym.m.MIPGap},{mym.Z1.getValue()},{mym.Z2.getValue()},{mym.Z3.getValue()},{mym.Z4.getValue()},{mym.Z5.getValue()},{dfi.loc[inst_name, 'objVal']},{dfi.loc[inst_name,'Z1']},{dfi.loc[inst_name,'Z2']},{dfi.loc[inst_name,'Z3']},{dfi.loc[inst_name,'Z4']},{dfi.loc[inst_name,'Z5']}"
                     # name,solved,type,objval,runtime_p,gap_p,Z1_p,Z2_p,Z3_p,Z4_p,Z5_p,FixObjVal,FixZ1,FixZ2,FixZ3,FixZ4,FixZ5
-                    rowp = f"{inst_name},{True},{p},{mymp.m.ObjVal},{mymp.m.Runtime},{mymp.m.MIPGap},{mymp.Z1.getValue()},{mymp.Z2.getValue()},{mymp.Z3.getValue()},{mymp.Z4.getValue()},{mymp.Z5.getValue()},{mym.m.ObjVal},{mym.m.Runtime},{mym.m.MIPGap},{mym.Z1.getValue()},{mym.Z2.getValue()},{mym.Z3.getValue()},{mym.Z4.getValue()},{mym.Z5.getValue()}"
+                    rowp = f"{inst_name},{True},{p},{mymp.m.ObjVal},{mymp.m.Runtime},{mymp.m.MIPGap},{mymp.Z1.getValue()},{mymp.Z2.getValue()},{mymp.Z3.getValue()},{mymp.Z4.getValue()},{mymp.Z5.getValue()},{mym.m.ObjVal},{mym.m.MIPGap},{mym.Z1.getValue()},{mym.Z2.getValue()},{mym.Z3.getValue()},{mym.Z4.getValue()},{mym.Z5.getValue()}"
 
                     with open('log_table_policies.csv', 'a') as mylog:
                         mylog.write(row + '\n')
@@ -460,7 +460,7 @@ if __name__ == "__main__":
             dfi.loc[inst_name,'EZ3'] =  mymf.Z3.getValue()
             dfi.loc[inst_name,'EZ4'] =  mymf.Z4.getValue()
             dfi.loc[inst_name,'EZ5'] =  mymf.Z5.getValue()
-            dfi.loc[inst_name,'VSS']=  (mymf.m.ObjVal - myms.m.ObjVal)/myms.m.ObjVal
+            dfi.loc[inst_name,'VSS']=  100*((mymf.m.ObjVal - myms.m.ObjVal)/myms.m.ObjVal)
 
             dfi.to_excel('instances_list.xlsx')
             with open('log_table.csv', 'a') as mylog:

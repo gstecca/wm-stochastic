@@ -142,22 +142,23 @@ def build_model_vrp(inst : Instance):
     if policy == 'P1':
         pass
     if policy == 'P2' or policy == 'P4' or policy == 'P5' or policy == 'P6':
+        #@DONE:
+        # per ogni cliente sommare sommare il delta sui timeslot.
+        # prendere il valore atteso e non la media degli scenari
+
         for j in range(1, inst.n + 1):
             mean = 0
-            for s in inst.S:  
-                for t in inst.T:
-                    mean += inst.delta[j,t,s]
-            mean = mean/inst.LS
-            d[j] = d[j] + mean
+            for t in inst.T:
+                mean += inst.delta_expected[j,t,1]
+            d[j] = inst.d[j] + mean
 
     if policy == 'P3':
         NT = math.ceil(inst.LT/2)
         for j in range(1, inst.n + 1):
-            mean = 0
-            for s in inst.S:  
-                for t in range(1, NT+1):
-                    mean += inst.delta[j,t,s]
-            mean = mean/(inst.LS*NT)
+            mean = 0 
+            for t in range(1, NT+1):
+                mean += inst.delta_expected[j,t,1]
+            #mean = mean/(inst.LS*NT)
             d[j] = d[j] + mean
         
     if policy == 'P4':
@@ -201,8 +202,8 @@ def build_model_vrp(inst : Instance):
         ZOB = gb.quicksum((1/inst.t[0,j])*u[j] for j in inst.V1 )
     else:
         ZOB1 = gb.quicksum(inst.c[i,j] * x[i,j] for i in inst.Vp for j in inst.Vs if j != i) 
-        #ZOB2 = K * gb.quicksum(mu[j] for j in inst.V)
-        ZOB = ZOB1 # + ZOB2 
+        ZOB2 = K * gb.quicksum(mu[j] for j in inst.V)
+        ZOB = ZOB1  + ZOB2 
 
     # if LOWER_BOUND:
     #    for i in inst.Vp:
@@ -276,7 +277,7 @@ def run_model(inst : Instance, mym : mymodel):
     mm.optimize()
     print('Optimization ended with status (2=optimal, 3=infeasible, 5=inf_or_unbounded, 9=timlimit, 11=interrupted)', mm.Status)
 
-def run(params : dict):
+def run(pms : dict):
     inst = load_instance(pms)
     print ("loaded instance with ", inst.n, ' nodes' )
     print (inst.to_string())
@@ -315,22 +316,31 @@ if __name__ == "__main__":
     inst_names = ['I2_N7_T30_C100_0', 'I2_N7_T30_C120_0']
     inst_names = ['I2_N7_T100_C100_0', 'I2_N7_T100_C120_0', 'I2_N7_T100_C120_0']
     inst_names = ['I2_N10_T100_C400_0']
-    dfi = pd.read_excel('instances_list.xlsx', index_col='name')
+    instance_list_filename = 'instances_list.xlsx' # 'instances_list_N8_filtered.xlsx' 
+    dfi = pd.read_excel(instance_list_filename, index_col='name')
     inst_names = list(dfi.index)
     counter = 0
+    fp = open('params.json')
+    pms = json.load(fp)
+    if pms['OVERWRITE_LOG']:
+        if os.path.isfile('log_table.csv'):
+            os.remove('log_table.csv')
+        if os.path.isfile('log_table_policies.csv'):
+            os.remove('log_table_policies.csv')
+        if os.path.isfile('log_table_policies_p.csv'):
+            os.remove('log_table_policies_p.csv')
     if not os.path.isfile('log_table_policies.csv'):
         with open('log_table_policies.csv', 'a') as mylog:
                         mylog.write('name,solved,type,objval,runtime,gap,Z1,Z2,Z3,Z4,Z5,SObjVal,SZ1,SZ2,SZ3,SZ4,SZ5\n')
     if not os.path.isfile('log_table_policies_p.csv'):
         with open('log_table_policies_p.csv', 'a') as mylog:
-                        mylog.write('name,solved,type,objval,runtime_p,gap_p,Z1_p,Z2_p,Z3_p,Z4_p,Z5_p,FixObjVal,FixZ1,FixZ2,FixZ3,FixZ4,FixZ5\n')
+                        mylog.write('name,solved,type,objval,runtime_p,gap_p,Z1_p,Z2_p,Z3_p,Z4_p,Z5_p,FixObjVal,FixGAP,FixZ1,FixZ2,FixZ3,FixZ4,FixZ5\n')
     dfpolicies = pd.read_csv('log_table_policies.csv', index_col=['name', 'type'])
     for inst_name in inst_names: # ['I3_N5_M2_T15_C100_DepLowerLeft_s0']:  #'I2_S1_0_C100' inst_names
         if len(sys.argv) > 1:
             inst_name = sys.argv[1]
         print(f'*********************************SOLVING INSTANCE {inst_name}******************\n***************************************************')
-        fp = open('params.json')
-        pms = json.load(fp)
+
 
         if pms['MODEL_TYPE'] == "POLICY":
             ssolved = dfi.loc[inst_name, 'solved']
@@ -342,6 +352,7 @@ if __name__ == "__main__":
             policies = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
             pms['inst_name'] = inst_name
             pms['FIX_SOLUTION'] = False
+            pms['INSTANCE_MEAN'] = False
             inst = load_instance(pms)
             print ("loaded instance with ", inst.n, ' nodes' )
             print (inst.to_string())
@@ -396,7 +407,7 @@ if __name__ == "__main__":
                     #
                     # name,solved,type,objval,runtime,gap,Z1,Z2,Z3,Z4,Z5,SObjVal,SZ1,SZ2,SZ3,SZ4,SZ5
                     row = f"{inst_name},{True},{p},{mym.m.ObjVal},{mym.m.Runtime},{mym.m.MIPGap},{mym.Z1.getValue()},{mym.Z2.getValue()},{mym.Z3.getValue()},{mym.Z4.getValue()},{mym.Z5.getValue()},{dfi.loc[inst_name, 'objVal']},{dfi.loc[inst_name,'Z1']},{dfi.loc[inst_name,'Z2']},{dfi.loc[inst_name,'Z3']},{dfi.loc[inst_name,'Z4']},{dfi.loc[inst_name,'Z5']}"
-                    # name,solved,type,objval,runtime_p,gap_p,Z1_p,Z2_p,Z3_p,Z4_p,Z5_p,FixObjVal,FixZ1,FixZ2,FixZ3,FixZ4,FixZ5
+                    # name,solved,type,objval,runtime_p,gap_p,Z1_p,Z2_p,Z3_p,Z4_p,Z5_p,FixObjVal,FixGAP,FixZ1,FixZ2,FixZ3,FixZ4,FixZ5
                     rowp = f"{inst_name},{True},{p},{mymp.m.ObjVal},{mymp.m.Runtime},{mymp.m.MIPGap},{mymp.Z1.getValue()},{mymp.Z2.getValue()},{mymp.Z3.getValue()},{mymp.Z4.getValue()},{mymp.Z5.getValue()},{mym.m.ObjVal},{mym.m.MIPGap},{mym.Z1.getValue()},{mym.Z2.getValue()},{mym.Z3.getValue()},{mym.Z4.getValue()},{mym.Z5.getValue()}"
 
                     with open('log_table_policies.csv', 'a') as mylog:
@@ -408,12 +419,16 @@ if __name__ == "__main__":
                 pms['XFIX'] = {}
         
         else:
+            ssolved = dfi.loc[inst_name, 'solved']
+            if ssolved and not pms['OVERWRITE_LOG']:
+                continue
             ###
             # Run stochastic model
             ###    
 
             pms['inst_name'] = inst_name
             pms['FIX_SOLUTION'] = False
+            pms['INSTANCE_MEAN'] = False
             print("###### Processing Instance named: ", inst_name, '   #############')
             print("######  FIX SOLUTION:             ", pms['FIX_SOLUTION'], '#################')
             myms = run(pms)
@@ -430,6 +445,7 @@ if __name__ == "__main__":
             inst_name_mean = inst_name + '_mean'
             pms['inst_name'] = inst_name_mean
             pms['FIX_SOLUTION'] = False
+            pms['INSTANCE_MEAN'] = True
             print("###### Processing Instance named: ", inst_name, '   #############')
             print("######  FIX SOLUTION:             ", pms['FIX_SOLUTION'], '#################')
             myma = run(pms)
@@ -439,6 +455,7 @@ if __name__ == "__main__":
             ########
             pms['inst_name'] = inst_name
             pms['FIX_SOLUTION'] = True
+            pms['INSTANCE_MEAN'] = False
             print("###### Processing Instance named: ", inst_name, '   #############')
             print("######  FIX SOLUTION:             ", pms['FIX_SOLUTION'], '#################')
             if myma.m.Status in [2,9,11]:    
@@ -462,7 +479,7 @@ if __name__ == "__main__":
             dfi.loc[inst_name,'EZ5'] =  mymf.Z5.getValue()
             dfi.loc[inst_name,'VSS']=  100*((mymf.m.ObjVal - myms.m.ObjVal)/myms.m.ObjVal)
 
-            dfi.to_excel('instances_list.xlsx')
+            dfi.to_excel(instance_list_filename)
             with open('log_table.csv', 'a') as mylog:
                 mylog.write(inst_name +',')
                 for c in dfi.columns:

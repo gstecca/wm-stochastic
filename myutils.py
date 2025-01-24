@@ -37,6 +37,7 @@ class Instance:
         self.ltw = {} # t:l
         self.d = {} # i:d
         self.delta = {} # (j,t,s):delta
+        self.delta_expected = {} # (j,t,1):delta_expected
         self.V = set()
         self.Vp = set()
         self.Vs = set()
@@ -249,7 +250,12 @@ def load_instance( params : dict):
     dftw = pd.read_excel(filename, sheet_name='time_windows')
     dfd = pd.read_excel(filename, sheet_name='demand')
     dfdelta = pd.read_excel(filename, sheet_name='delta')
-    
+    df_delta_expected = pd.DataFrame()
+    if not params['INSTANCE_MEAN']:
+        df_delta_expected = pd.read_excel(filename, sheet_name='delta_expected')
+    else:
+        df_delta_expected = dfdelta.copy()
+       
     inst = Instance()
     inst.params = params
     inst.name = inst_name
@@ -291,6 +297,9 @@ def load_instance( params : dict):
 
     for index, row in dfdelta.iterrows():
         inst.delta[ (row['j'], row['t'], row['s']) ] = row['delta']
+    
+    for index, row in df_delta_expected.iterrows():
+        inst.delta_expected[ (row['j'], row['t'], row['s']) ] = row['delta']
 
     inst.fillV()
     inst.expandNetwork()

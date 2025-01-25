@@ -316,7 +316,7 @@ if __name__ == "__main__":
     inst_names = ['I2_N7_T30_C100_0', 'I2_N7_T30_C120_0']
     inst_names = ['I2_N7_T100_C100_0', 'I2_N7_T100_C120_0', 'I2_N7_T100_C120_0']
     inst_names = ['I2_N10_T100_C400_0']
-    instance_list_filename = 'instances_list.xlsx' # 'instances_list_N8_filtered.xlsx' 
+    instance_list_filename = 'instances_list_N8_tail.xlsx' # 'instances_list_N8_filtered.xlsx' 
     dfi = pd.read_excel(instance_list_filename, index_col='name')
     inst_names = list(dfi.index)
     counter = 0

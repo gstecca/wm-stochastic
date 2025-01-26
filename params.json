@@ -9,7 +9,7 @@
 "LOWER_BOUND" : false,
 "VALID_INEQUALITIES" : false,
 "POLICY" : "P0",
-"MODEL_TYPE" : "STOCHASTIC",
+"MODEL_TYPE" : "POLICY",
 "XFIX" : {},
 "PROVA_PARAM" : true,
 "OVERWRITE_LOG": false,

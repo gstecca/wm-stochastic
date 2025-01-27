@@ -250,11 +250,14 @@ def load_instance( params : dict):
     dftw = pd.read_excel(filename, sheet_name='time_windows')
     dfd = pd.read_excel(filename, sheet_name='demand')
     dfdelta = pd.read_excel(filename, sheet_name='delta')
-    df_delta_expected = pd.DataFrame()
-    if not params['INSTANCE_MEAN']:
-        df_delta_expected = pd.read_excel(filename, sheet_name='delta_expected')
-    else:
-        df_delta_expected = dfdelta.copy()
+    df_delta_expected = pd.read_excel(filename, sheet_name='delta_expected')
+    if params['INSTANCE_MEAN']:
+        dfdelta = df_delta_expected.copy()
+
+    # if not params['INSTANCE_MEAN']:
+    #     df_delta_expected = pd.read_excel(filename, sheet_name='delta_expected')
+    # else:
+    #     df_delta_expected = dfdelta.copy()
        
     inst = Instance()
     inst.params = params
@@ -265,6 +268,8 @@ def load_instance( params : dict):
     inst.T = [t for t in range(1, inst.LT+1)]
     inst.m = dfp.loc['m','value']
     inst.LS = dfp.loc['LS','value']
+    if params['INSTANCE_MEAN']:
+        inst.LS = 1
     inst.S = [s for s in range(1, inst.LS + 1)]
     inst.C = dfp.loc['C','value']
     inst.p = dfp.loc['p','value']

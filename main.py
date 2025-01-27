@@ -9,7 +9,8 @@ import os
 
 def build_model(inst : Instance):
     xfix = inst.params['XFIX']
-    if inst.params['POLICY'] != 'P0':
+    policy = inst.params['POLICY']
+    if policy not in ['P0', 'P7', 'P8']:
         return build_model_vrp(inst)
     mym = mymodel()
     mm = gb.Model('FSG')
@@ -349,7 +350,8 @@ if __name__ == "__main__":
                     mylog.write(f'{inst_name},{ssolved},,,,,,,,,,,,,,,\n')
                     continue
 
-            policies = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
+            #policies = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
+            policies = ['P7', 'P8']
             pms['inst_name'] = inst_name
             pms['FIX_SOLUTION'] = False
             pms['INSTANCE_MEAN'] = False
@@ -446,7 +448,7 @@ if __name__ == "__main__":
             pms['inst_name'] = inst_name_mean
             pms['FIX_SOLUTION'] = False
             pms['INSTANCE_MEAN'] = True
-            print("###### Processing Instance named: ", inst_name, '   #############')
+            print("###### Processing Instance named: ", inst_name_mean, '   #############')
             print("######  FIX SOLUTION:             ", pms['FIX_SOLUTION'], '#################')
             myma = run(pms)
 

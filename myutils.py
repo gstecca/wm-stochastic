@@ -122,7 +122,7 @@ class mymodel:
         self.Z2 = None
         self.Z3 = None
         self.Z4 = None
-        self.MODEL_TYPE = 'STOCHASTIC' # STOCHASTIC, POLICY
+        self.Z5 = None
     def set(self, m, x, U, TBar, y, Q, R, L, rho, lambd, alpha, Z1, Z2, Z3, Z4, Z5, type):
         self.m = m
         self.x = x
@@ -140,7 +140,6 @@ class mymodel:
         self.Z3 = Z3
         self.Z4 = Z4
         self.Z5 = Z5
-        self.MODEL_TYPE = type
 
     def to_excel(self, inst: Instance):
         policy = inst.params['POLICY']

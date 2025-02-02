@@ -10,32 +10,51 @@ import os
 def build_model(inst : Instance):
     xfix = inst.params['XFIX']
     policy = inst.params['POLICY']
-    if policy not in ['P0', 'P7', 'P8']:
-        return build_model_vrp(inst)
-    mym = mymodel()
+    if policy not in ['P0','P7', 'P8', 'P11', 'P12'] :
+        return build_model_vrp(inst)  # policies based on VRP model
+    mym = mymodel()  # stochastic model or polices based on EVV model
     mm = gb.Model('FSG')
     if inst.params['LOWER_BOUND']:
         #inst.p = 0
         #inst.delta ={k:0 for k in inst.delta}
         pass
+    S = inst.S
+    LS = inst.LS
+    delta = inst.delta
+    C = inst.C
+    capResize = 0.1
+    capResizeP5 = 0.15
+    if policy in ['P11', 'P12']:
+        capResize = 0.20
+        capResizeP5 = 0.30
+    if policy in ['P7', 'P8', 'P11', 'P12']:  # P7 and P8 are based on P4, and P5, while P11 and P12 are based on P9 and P10
+        delta = inst.delta_expected
+        S = [1]
+        LS = 1
+    
+    
+    if policy == 'P7' or policy == 'P11':  # just like 'P4' but with the expected value of delta
+        C = C*(1-capResize)
+
+
     x = {(i,j) : mm.addVar(vtype = GRB.BINARY, name='x_{}_{}'.format(i,j)) for i in inst.Vp for j in inst.Vs if i != j }
     U = {(j,t) : mm.addVar(vtype = GRB.BINARY, name='U_{}_{}'.format(j,t)) for j in inst.Vs for t in inst.T}
     TBar = {i : mm.addVar(vtype = GRB.CONTINUOUS, lb = 0, name = 'TBar_{}'.format(i)) for i in inst.V}
-    y = {(i,j,s) :mm.addVar(vtype = GRB.BINARY, name = 'y_{}_{}_{}'.format(i,j,s)) for i in inst.Vp for j in inst.Vs for s in inst.S if j!=i }
-    Q = {(j,s) : mm.addVar(vtype=  GRB.CONTINUOUS, lb = 0, name = 'Q_{}_{}'.format(j,s)) for j in inst.V for s in inst.S}
-    R = {(j,s) : mm.addVar(vtype=  GRB.CONTINUOUS, lb = 0, name = 'R_{}_{}'.format(j,s)) for j in range(inst.n+1, inst.n+inst.m+1) for s in inst.S}
-    L = {(j,s) : mm.addVar(vtype=  GRB.CONTINUOUS, lb = 0, name = 'L_{}_{}'.format(j,s)) for j in range(1, inst.n + 1) for s in inst.S}
-    rho = {(j,s) : mm.addVar(vtype=  GRB.BINARY,  name = 'rho_{}_{}'.format(j,s)) for j in range(1, inst.n + 1) for s in inst.S}
-    lambd = {(j,s) : mm.addVar(vtype=  GRB.BINARY,  name = 'lambd_{}_{}'.format(j,s)) for j in range(1, inst.n + 1) for s in inst.S}
-    alpha = {(j,s) : mm.addVar(vtype=  GRB.BINARY,  name = 'alpha_{}_{}'.format(j,s)) for j in range(1, inst.n + 1) for s in inst.S}
+    y = {(i,j,s) :mm.addVar(vtype = GRB.BINARY, name = 'y_{}_{}_{}'.format(i,j,s)) for i in inst.Vp for j in inst.Vs for s in S if j!=i }
+    Q = {(j,s) : mm.addVar(vtype=  GRB.CONTINUOUS, lb = 0, name = 'Q_{}_{}'.format(j,s)) for j in inst.V for s in S}
+    R = {(j,s) : mm.addVar(vtype=  GRB.CONTINUOUS, lb = 0, name = 'R_{}_{}'.format(j,s)) for j in range(inst.n+1, inst.n+inst.m+1) for s in S}
+    L = {(j,s) : mm.addVar(vtype=  GRB.CONTINUOUS, lb = 0, name = 'L_{}_{}'.format(j,s)) for j in range(1, inst.n + 1) for s in S}
+    rho = {(j,s) : mm.addVar(vtype=  GRB.BINARY,  name = 'rho_{}_{}'.format(j,s)) for j in range(1, inst.n + 1) for s in S}
+    lambd = {(j,s) : mm.addVar(vtype=  GRB.BINARY,  name = 'lambd_{}_{}'.format(j,s)) for j in range(1, inst.n + 1) for s in S}
+    alpha = {(j,s) : mm.addVar(vtype=  GRB.BINARY,  name = 'alpha_{}_{}'.format(j,s)) for j in range(1, inst.n + 1) for s in S}
 
     mm.update()
 
     ZOB1 = gb.quicksum(inst.c[i,j] * x[i,j] for i in inst.Vp for j in inst.Vs if j != i) 
-    ZOB2 = (1/inst.LS) * gb.quicksum(inst.c[i,j] * y[i,j,s] for s in inst.S for i in range(1, inst.n+1) for j in inst.Vs if j != i)
-    ZOB3 = (1/inst.LS) * gb.quicksum(inst.c[j,0] * alpha[j,s] for s in inst.S for j in inst.V1)
-    ZOB4 = (1/inst.LS) * gb.quicksum(inst.p * R[j,s] for s in inst.S for j in range(inst.n + 1, inst.n + inst.m + 1) )
-    ZOB5 = (1/inst.LS) * gb.quicksum(inst.p * L[j,s] for s in inst.S for j in inst.V1)
+    ZOB2 = (1/LS) * gb.quicksum(inst.c[i,j] * y[i,j,s] for s in S for i in range(1, inst.n+1) for j in inst.Vs if j != i)
+    ZOB3 = (1/LS) * gb.quicksum(inst.c[j,0] * alpha[j,s] for s in S for j in inst.V1)
+    ZOB4 = (1/LS) * gb.quicksum(inst.p * R[j,s] for s in S for j in range(inst.n + 1, inst.n + inst.m + 1) )
+    ZOB5 = (1/LS) * gb.quicksum(inst.p * L[j,s] for s in S for j in inst.V1)
     ZOB = ZOB1 - ZOB2 + ZOB3 + ZOB4 + ZOB5
 
     # if LOWER_BOUND:
@@ -81,32 +100,37 @@ def build_model(inst : Instance):
     mm.addConstrs(( inst.etw[t] - inst.Tmax * (1 - U[j,t]) - TBar[j]  <= 0 for j in inst.Vs for t in inst.T), name = 'ct08.1')
     mm.addConstrs(( TBar[j]  - inst.ltw[t] - inst.Tmax * (1 - U[j,t]) <= 0 for j in inst.Vs for t in inst.T), name = 'ct08.2')
 
-    mm.addConstrs((Q[0,s] == 0  for s in inst.S), name = 'ct09')
-    mm.addConstrs((Q[j,s] - Q[i,s] + inst.M * (1 - x[i,j]) - inst.d[j] - gb.quicksum( inst.delta[j,tau,s] * U[j,t] for t in inst.T for tau in range(1, t+1 ))  >= 0
-                   for s in inst.S for i in inst.Vp for j in range(1, inst.n + 1) if j != i), name = 'ct10')
-    mm.addConstrs((Q[j,s] - Q[i,s] - inst.M * (1 - x[i,j]) - inst.d[j] - gb.quicksum( inst.delta[j,tau,s] * U[j,t] for t in inst.T for tau in range(1, t+1 ))  <= 0
-                   for s in inst.S for i in inst.Vp for j in range(1, inst.n + 1) if j != i), name = 'ct10_new')
-    mm.addConstrs((Q[j,s] - Q[i,s] + inst.M * (1 - x[i,j]) >= 0 for s in inst.S for i in inst.Vp for j in range(inst.n + 1, inst.n + inst.m + 1)), name = 'ct11')
-    mm.addConstrs((Q[j,s] - Q[i,s] - inst.M * (1 - x[i,j]) <= 0 for s in inst.S for i in inst.Vp for j in range(inst.n + 1, inst.n + inst.m + 1)), name = 'ct11_new')
-    mm.addConstrs((R[j,s] - Q[j,s] + inst.C >= 0 for s in inst.S for j in range(inst.n + 1, inst.n + inst.m + 1)), name = 'ct12') 
+    mm.addConstrs((Q[0,s] == 0  for s in S), name = 'ct09')
+    mm.addConstrs((Q[j,s] - Q[i,s] + inst.M * (1 - x[i,j]) - inst.d[j] - gb.quicksum( delta[j,tau,s] * U[j,t] for t in inst.T for tau in range(1, t+1 ))  >= 0
+                   for s in S for i in inst.Vp for j in range(1, inst.n + 1) if j != i), name = 'ct10')
+    mm.addConstrs((Q[j,s] - Q[i,s] - inst.M * (1 - x[i,j]) - inst.d[j] - gb.quicksum( delta[j,tau,s] * U[j,t] for t in inst.T for tau in range(1, t+1 ))  <= 0
+                   for s in S for i in inst.Vp for j in range(1, inst.n + 1) if j != i), name = 'ct10_new')
+    mm.addConstrs((Q[j,s] - Q[i,s] + inst.M * (1 - x[i,j]) >= 0 for s in S for i in inst.Vp for j in range(inst.n + 1, inst.n + inst.m + 1)), name = 'ct11')
+    mm.addConstrs((Q[j,s] - Q[i,s] - inst.M * (1 - x[i,j]) <= 0 for s in S for i in inst.Vp for j in range(inst.n + 1, inst.n + inst.m + 1)), name = 'ct11_new')
+    mm.addConstrs((R[j,s] - Q[j,s] + C >= 0 for s in S for j in range(inst.n + 1, inst.n + inst.m + 1)), name = 'ct12') 
     #mm.addConstrs((R[j,s]  >= 0 for s in inst.S for j in range(inst.n + 1, inst.n + inst.m + 1)), name = 'ct13') already considered in variable definition
     
-    mm.addConstrs((L[j,s] - gb.quicksum( inst.delta[j,tau,s] * U[j,t] for t in inst.T for tau in range(t+1, inst.LT + 1)) == 0 for s in inst.S for j in inst.V1), name = 'ct14')
+    mm.addConstrs((L[j,s] - gb.quicksum( delta[j,tau,s] * U[j,t] for t in inst.T for tau in range(t+1, inst.LT + 1)) == 0 for s in S for j in inst.V1), name = 'ct14')
 
-    mm.addConstrs((rho[j,s] - ((1/inst.Qmax)*(Q[j,s] - inst.C)) >= 0 for s in inst.S for j in inst.V1), name = 'ct15')
-    mm.addConstrs((rho[j,s] + ((1/inst.Qmax)*(inst.C - Q[j,s] )) <= 1 for s in inst.S for j in inst.V1), name = 'ct16') 
+    if policy == 'P8' or policy == 'P12':
+        f = {j : capResizeP5 if j%2 == 0 else -capResizeP5 for j in inst.V}
+        mm.addConstrs((rho[j,s] - ((1/inst.Qmax)*(Q[j,s] - C*(1+f[j]))) >= 0 for s in S for j in inst.V1), name = 'ct15')
+        mm.addConstrs((rho[j,s] + ((1/inst.Qmax)*(C*(1+f[j]) - Q[j,s] )) <= 1 for s in S for j in inst.V1), name = 'ct16')
+    else:
+        mm.addConstrs((rho[j,s] - ((1/inst.Qmax)*(Q[j,s] - C)) >= 0 for s in S for j in inst.V1), name = 'ct15')
+        mm.addConstrs((rho[j,s] + ((1/inst.Qmax)*(C - Q[j,s] )) <= 1 for s in S for j in inst.V1), name = 'ct16') 
 
     #mm.addConstrs((rho[j,s] + inst.Qmax*R[j,s] >= 1 for s in inst.S for j in range(1, inst.n + 1)) , name = 'ct_rho_new')
 
-    mm.addConstrs((y[i,j,s] - 0.5 * (x[i,j] + rho[i,s]) <= 0 for s in inst.S for i in inst.V1 for j in inst.Vs if j != i), name = 'ct17')
+    mm.addConstrs((y[i,j,s] - 0.5 * (x[i,j] + rho[i,s]) <= 0 for s in S for i in inst.V1 for j in inst.Vs if j != i), name = 'ct17')
 
-    mm.addConstrs( (y[0,j,s] == 0 for s in inst.S for j in inst.Vs), name='cty0')
-    mm.addConstrs(( alpha[j,s] == gb.quicksum(y[j,i,s] for i in inst.Vs if j!=i) - gb.quicksum(y[i,j,s] for i in range(1, inst.n+1) if j!=i)  for s in inst.S for j in range(1, inst.n + 1)), name = 'ctyalpha')
+    mm.addConstrs( (y[0,j,s] == 0 for s in S for j in inst.Vs), name='cty0')
+    mm.addConstrs(( alpha[j,s] == gb.quicksum(y[j,i,s] for i in inst.Vs if j!=i) - gb.quicksum(y[i,j,s] for i in range(1, inst.n+1) if j!=i)  for s in S for j in range(1, inst.n + 1)), name = 'ctyalpha')
 
     if inst.params['VALID_INEQUALITIES']:
         mm.addConstr(  gb.quicksum(x[i,j] for i in inst.Vp for j in inst.Vs  if i != j  ) <= len(inst.V1) + inst.m, name="vi1.1" )
         mm.addConstr(  gb.quicksum(x[i,j] for i in inst.Vp for j in inst.Vs  if i != j ) >= len(inst.V1) , name="vi1.2" )
-        mm.addConstrs( ( gb.quicksum( y[i,j,s] for i in inst.Vp for j in inst.Vs if j!=i ) -  gb.quicksum(rho[j,s] for j in range(1, inst.n + 1)  ) <= 0 for s in inst.S), name="vi2" )
+        mm.addConstrs( ( gb.quicksum( y[i,j,s] for i in inst.Vp for j in inst.Vs if j!=i ) -  gb.quicksum(rho[j,s] for j in range(1, inst.n + 1)  ) <= 0 for s in S), name="vi2" )
     
     """
     mm.addConstr(x[0,1]==1)
@@ -127,7 +151,7 @@ def build_model(inst : Instance):
     if (inst.params['WRITE_LP']):
         mm.write('results/model_'+inst.name+'.lp')
 
-    mym.set(mm, x, U, TBar, y, Q, R, L, rho, lambd, alpha, ZOB1, ZOB2, ZOB3, ZOB4, ZOB5, 'STOCHASTIC')
+    mym.set(mm, x, U, TBar, y, Q, R, L, rho, lambd, alpha, ZOB1, ZOB2, ZOB3, ZOB4, ZOB5)
     return mym
 
 def build_model_vrp(inst : Instance):
@@ -136,13 +160,16 @@ def build_model_vrp(inst : Instance):
     policy = inst.params['POLICY']
     capResize = 0.1
     capResizeP5 = 0.15
+    if policy == 'P9' or policy == 'P10':
+        capResize = 0.20
+        capResizeP5 = 0.30
 
     d = {k:v for k,v in inst.d.items()}
     C = inst.C
 
     if policy == 'P1':
         pass
-    if policy == 'P2' or policy == 'P4' or policy == 'P5' or policy == 'P6':
+    if policy == 'P2' or policy == 'P4' or policy == 'P5' or policy == 'P6' or policy == 'P9' or policy == 'P10':
         #@DONE:
         # per ogni cliente sommare il delta sui timeslot.
         # prendere il valore atteso e non la media degli scenari
@@ -159,10 +186,10 @@ def build_model_vrp(inst : Instance):
             mean = 0 
             for t in range(1, NT+1):
                 mean += inst.delta_expected[j,t,1]
-            #mean = mean/(inst.LS*NT)
+            #mean = mean/(LS*NT)
             d[j] = d[j] + mean
         
-    if policy == 'P4':
+    if policy == 'P4' or policy == 'P9':
         C = C*(1-capResize)
     if policy == 'P5':
         pass
@@ -234,7 +261,7 @@ def build_model_vrp(inst : Instance):
     mm.addConstrs((Q[j] - Q[i] + inst.M * (1 - x[i,j]) >= 0 for i in inst.Vp for j in range(inst.n + 1, inst.n + inst.m + 1)), name = 'ct11')
     #mm.addConstrs((Q[j] - Q[i] - inst.M * (1 - x[i,j]) <= 0 for i in inst.Vp for j in range(inst.n + 1, inst.n + inst.m + 1)), name = 'ct11_new')
     
-    if policy == 'P5':
+    if policy == 'P5' or policy == 'P10':
         f = {j : capResizeP5 if j%2 == 0 else -capResizeP5 for j in inst.V}
         mm.addConstrs((Q[j] <= C*(1 + f[j]) + mu[j] for j in inst.V), name = 'ctcap')
     else:
@@ -266,9 +293,9 @@ def build_model_vrp(inst : Instance):
     if (inst.params['WRITE_LP']):
         mm.write('results/model_'+inst.name+'_'+ policy +'.lp')
     if policy != 'P6':
-        mym.set(mm, x, U, TBar, None, Q, None, None, None, None, None, ZOB1, Z_Zero, Z_Zero, Z_Zero, Z_Zero, 'POLICY')
+        mym.set(mm, x, U, TBar, None, Q, None, None, None, None, None, ZOB1, Z_Zero, Z_Zero, Z_Zero, Z_Zero)
     else:
-        mym.set(mm, x, U, TBar, None, Q, None, None, None, None, None, ZOB, Z_Zero, Z_Zero, Z_Zero, Z_Zero, 'POLICY')
+        mym.set(mm, x, U, TBar, None, Q, None, None, None, None, None, ZOB, Z_Zero, Z_Zero, Z_Zero, Z_Zero)
     return mym
 
 def run_model(inst : Instance, mym : mymodel):
@@ -351,7 +378,11 @@ if __name__ == "__main__":
                     continue
 
             #policies = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
-            policies = ['P7', 'P8']
+
+            # P7 and P8 are based on P4, and P5 solved with EVV, 
+            # P9 and P10 are based on P4 but with augmented percentage of capacity reduction
+            # P11 and P12 are based on P9 and P10 but with EVV
+            policies = ['P7', 'P8', 'P9', 'P10', 'P11', 'P12'] 
             pms['inst_name'] = inst_name
             pms['FIX_SOLUTION'] = False
             pms['INSTANCE_MEAN'] = False

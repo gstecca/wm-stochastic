@@ -123,7 +123,7 @@ class mymodel:
         self.Z3 = None
         self.Z4 = None
         self.Z5 = None
-    def set(self, m, x, U, TBar, y, Q, R, L, rho, lambd, alpha, Z1, Z2, Z3, Z4, Z5, type):
+    def set(self, m, x, U, TBar, y, Q, R, L, rho, lambd, alpha, Z1, Z2, Z3, Z4, Z5):
         self.m = m
         self.x = x
         self.U = U

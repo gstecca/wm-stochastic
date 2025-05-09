@@ -505,6 +505,8 @@ if __name__ == "__main__":
             dfi.loc[inst_name,'Z4'] =  myms.Z4.getValue()
             dfi.loc[inst_name,'Z5'] =  myms.Z5.getValue()
             dfi.loc[inst_name,'EVV']=  mymf.m.ObjVal
+            dfi.loc[inst_name,'EVVgap']=  mymf.m.MIPGap
+            dfi.loc[inst_name,'EVVrunTime']=  mymf.m.Runtime
             dfi.loc[inst_name,'EZ1'] =  mymf.Z1.getValue()
             dfi.loc[inst_name,'EZ2'] =  mymf.Z2.getValue()
             dfi.loc[inst_name,'EZ3'] =  mymf.Z3.getValue()

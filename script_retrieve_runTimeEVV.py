@@ -17,7 +17,7 @@ for instance_name in dfi.index:
     print(f"Reading {path}")
     df = pd.read_excel(path, index_col='param')
     runTime = df.loc['runtime', 'value']
-    gap = df.loc['objValue', 'value']
+    gap = df.loc['gap', 'value']
     df_run_gap_EEV.loc[len(df_run_gap_EEV)] = [instance_name,runTime, gap]
 # Save the results to an Excel file
 minimum_runTime = df_run_gap_EEV['runTimeEEV'].min()

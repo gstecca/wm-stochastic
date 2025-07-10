@@ -344,13 +344,16 @@ if __name__ == "__main__":
     # inst_names = ['I2_N7_T30_C100_0', 'I2_N7_T30_C120_0']
     # inst_names = ['I2_N7_T100_C100_0', 'I2_N7_T100_C120_0', 'I2_N7_T100_C120_0']
     # inst_names = ['I2_N10_T100_C400_0']
-    instance_list_filename = 'instances_list_N8_filtered.xlsx'
-    instance_list_filename = 'instances_list_548.xlsx' 
-    dfi = pd.read_excel(instance_list_filename, index_col='name')
-    inst_names = list(dfi.index)
     counter = 0
     fp = open('params.json')
     pms = json.load(fp)
+
+    instance_list_filename = 'instances_list_N8_filtered.xlsx'
+    if pms['MODEL_TYPE'] == "BESTPOLICY":
+        instance_list_filename = 'instances_list_548.xlsx' 
+    dfi = pd.read_excel(instance_list_filename, index_col='name')
+    inst_names = list(dfi.index)
+
     if pms['OVERWRITE_LOG']:
         if os.path.isfile('log_table.csv'):
             os.remove('log_table.csv')

@@ -335,16 +335,17 @@ if __name__ == "__main__":
 
     #inst_names = ['I2_N7_T100_C140_0', 'I2_N7_T100_C210_0', 'I2_N7_T100_C280_0']
     #inst_names = ['I2_N10_T30_C250_0', 'I2_N10_T30_C275_0', 'I2_N10_T30_C325_0','I2_N10_T100_C275_0', 'I2_N10_T100_C325_0' ]
-    inst_names = ['I2_N7_T30_C280_0', 'I2_N7_T30_C210_0', 'I2_N7_T30_C140_0', 'I2_N7_T100_C280_0', 'I2_N7_T100_C210_0', 'I2_N7_T100_C140_0', 
-                   'I2_N5_T30_C200_0', 'I2_N5_T30_C150_0', 'I2_N5_T30_C100_0', 'I2_N5_T100_C200_0', 'I2_N5_T100_C150_0', 'I2_N5_T100_C100_0', 
-                   'I2_N10_T30_C400_0', 'I2_N10_T30_C350_0', 'I2_N10_T30_C325_0', 'I2_N10_T30_C300_0', 'I2_N10_T30_C275_0', 'I2_N10_T100_C400_0', 
-                   'I2_N10_T100_C350_0', 'I2_N10_T100_C325_0', 'I2_N10_T100_C300_0', 'I2_N10_T100_C275_0']
-    inst_names = ['I1_RTSL']
-    inst_names = ['I1_R2']
-    inst_names = ['I2_N7_T30_C100_0', 'I2_N7_T30_C120_0']
-    inst_names = ['I2_N7_T100_C100_0', 'I2_N7_T100_C120_0', 'I2_N7_T100_C120_0']
-    inst_names = ['I2_N10_T100_C400_0']
-    instance_list_filename = 'instances_list_N8_filtered.xlsx' 
+    # inst_names = ['I2_N7_T30_C280_0', 'I2_N7_T30_C210_0', 'I2_N7_T30_C140_0', 'I2_N7_T100_C280_0', 'I2_N7_T100_C210_0', 'I2_N7_T100_C140_0', 
+    #                'I2_N5_T30_C200_0', 'I2_N5_T30_C150_0', 'I2_N5_T30_C100_0', 'I2_N5_T100_C200_0', 'I2_N5_T100_C150_0', 'I2_N5_T100_C100_0', 
+    #                'I2_N10_T30_C400_0', 'I2_N10_T30_C350_0', 'I2_N10_T30_C325_0', 'I2_N10_T30_C300_0', 'I2_N10_T30_C275_0', 'I2_N10_T100_C400_0', 
+    #                'I2_N10_T100_C350_0', 'I2_N10_T100_C325_0', 'I2_N10_T100_C300_0', 'I2_N10_T100_C275_0']
+    # inst_names = ['I1_RTSL']
+    # inst_names = ['I1_R2']
+    # inst_names = ['I2_N7_T30_C100_0', 'I2_N7_T30_C120_0']
+    # inst_names = ['I2_N7_T100_C100_0', 'I2_N7_T100_C120_0', 'I2_N7_T100_C120_0']
+    # inst_names = ['I2_N10_T100_C400_0']
+    instance_list_filename = 'instances_list_N8_filtered.xlsx'
+    instance_list_filename = 'instances_list_548.xlsx' 
     dfi = pd.read_excel(instance_list_filename, index_col='name')
     inst_names = list(dfi.index)
     counter = 0
@@ -370,7 +371,7 @@ if __name__ == "__main__":
         print(f'*********************************SOLVING INSTANCE {inst_name}******************\n***************************************************')
 
 
-        if pms['MODEL_TYPE'] == "POLICY":
+        if pms['MODEL_TYPE'] == "POLICY" or pms['MODEL_TYPE'] == "BESTPOLICY":
             ssolved = dfi.loc[inst_name, 'solved']
             if not ssolved:
                 with open('log_table_policies.csv', 'a') as mylog:
@@ -382,7 +383,15 @@ if __name__ == "__main__":
             # P7 and P8 are based on P4, and P5 solved with EVV, 
             # P9 and P10 are based on P4 but with augmented percentage of capacity reduction
             # P11 and P12 are based on P9 and P10 but with EVV
-            policies = ['P7', 'P8', 'P9', 'P10', 'P11', 'P12'] 
+            policies = ['P7', 'P8', 'P9', 'P10', 'P11', 'P12']
+            if pms['MODEL_TYPE'] == "BESTPOLICY":
+                # salta le istanze con gap > 0.0001
+                if dfi.loc[inst_name, 'FILTRO'] == 0:
+                    continue
+                # considera solo la migliore policy
+                policies = []
+                p = dfi.loc[inst_name, 'bestpolicy']
+                policies.append(p)
             pms['inst_name'] = inst_name
             pms['FIX_SOLUTION'] = False
             pms['INSTANCE_MEAN'] = False
@@ -435,6 +444,10 @@ if __name__ == "__main__":
                     pms['POLICY'] = p
                     mym.to_excel(inst)
 
+                    # save the solution of the best policy in the instance list
+                    if pms['MODEL_TYPE'] == "BESTPOLICY":
+                        dfi.loc[inst_name, 'policyvalue'] = mym.m.ObjVal
+
                     #
                     # WRITE AGGREGATED RESULT APPENDED ON INSTANCE LIST FILES
                     #
@@ -450,6 +463,10 @@ if __name__ == "__main__":
 
                 # reset x solution in order to pass to the next policy
                 pms['XFIX'] = {}
+            # save the modified dataframe with the best policy values
+            if pms['MODEL_TYPE'] == "BESTPOLICY":
+                dfi.to_excel(instance_list_filename)
+
         
         else:
             ssolved = dfi.loc[inst_name, 'solved']

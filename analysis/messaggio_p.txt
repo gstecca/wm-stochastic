@@ -1,0 +1,1 @@
+ Vi mando un ulteriore file excel. Qui trovate con suffisso _p tempi gap e valori funzione obiettivo delle policies. Mentre i campi con prefisso fix sono i valori che si ottengono imponendo la soluzione della policy nel modello stocastico. 

@@ -1,0 +1,78 @@
+
+
+            
+# P7 and P8 are based on P4, and P5 solved with EVV, 
+# P9 and P10 are based on P4 but with augmented percentage of capacity reduction
+# P11 and P12 are based on P9 and P10 but with EVV
+
+
+
+['P0','P7', 'P8', 'P11', 'P12']: policies based on SM (EVV)
+
+['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P9', 'P10']: policies based on VRP
+
+
+
+###########Policies based on SM:
+    if policy in ['P11', 'P12']:
+        capResize = 0.20
+        capResizeP5 = 0.30
+    if policy in ['P7', 'P8', 'P11', 'P12']:  # P7 and P8 are based on P4, and P5, while P11 and P12 are based on P9 and P10
+        delta = inst.delta_expected
+        S = [1]
+        LS = 1
+    
+    
+    if policy == 'P7' or policy == 'P11':  # just like 'P4' but with the expected value of delta
+        C = C*(1-capResize)
+
+    if policy == 'P8' or policy == 'P12':
+        f = {j : capResizeP5 if j%2 == 0 else -capResizeP5 for j in inst.V}
+
+
+#############Policies based on VRP (build_model_vrp) ################
+
+    if policy == 'P9' or policy == 'P10':
+        capResize = 0.20
+        capResizeP5 = 0.30
+
+    if policy == 'P2' or policy == 'P4' or policy == 'P5' or policy == 'P6' or policy == 'P9' or policy == 'P10':
+        #@DONE:
+        # per ogni cliente sommare il delta sui timeslot.
+        # prendere il valore atteso e non la media degli scenari
+
+    if policy == 'P3':
+        NT = math.ceil(inst.LT/2)
+        for j in range(1, inst.n + 1):
+            mean = 0 
+            for t in range(1, NT+1):
+                mean += inst.delta_expected[j,t,1]
+            #mean = mean/(LS*NT)
+            d[j] = d[j] + mean
+        
+    if policy == 'P4' or policy == 'P9':
+        C = C*(1-capResize)
+
+
+    if policy == 'P5' or policy == 'P10':
+        f = {j : capResizeP5 if j%2 == 0 else -capResizeP5 for j in inst.V}
+        mm.addConstrs((Q[j] <= C*(1 + f[j]) + mu[j] for j in inst.V), name = 'ctcap')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

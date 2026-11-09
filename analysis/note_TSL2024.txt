@@ -1,0 +1,8 @@
+capacità grande -> short sited (miope)... 
+
+le policies sono tutte focalizzate solo sul routing
+
+complessità VRP nelle policies bassa rispetto a complessità dello stocastico e dell'EVV
+
+
+I2_N10_T30_C325_0 

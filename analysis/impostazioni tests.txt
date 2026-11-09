@@ -1,0 +1,53 @@
+Istanze:
+ posizione deposito: localizzato in un angolo del piano cartesiano (0,0) / centrale (5,5)
+ posizione clienti: random ([0,10], [0,10])
+ assegnazione random di una classe a ciascun nodo e generazione conseguente di domanda e delta
+ classi:
+    1: domanda bassa, delta: alto, basso, basso
+	2: domanda media, delta: medio, alto, basso
+	3: domanda alta, delta: basso, basso, medio
+	
+n. clienti: 5, 6, 7, 8, 9, 10
+
+
+
+
+#DUBBIO:
+Forse le istanze le dobbiamo fare anche ipotizzando scenari tipici (esempio pessimistici / sovrabbondanti) oppure scenari con probabilità non uniforme
+
+
+
+log_table_policies.csv -> fixed vs stocastico
+
+log_table_policies_p.csv > policy vs fixed
+
+
+02/12/2024
+-- alzare di un veicolo le istanze attualmente inammissibili.
+-- controllare log_table.csv
+
+######################## 04/02/2025 ##################
+
+Riepilogo le nuove policies ricordando che P4 ha una riduzione della
+capacità del 10% mentre la pP5 ha una riduzione e un aumento alternato
+della capacità dei veicoli del 15%:
+
+P7: come P4 ma usa EVV
+
+P8: come P5 ma usa EVV
+
+P9: come P4 (usa VRP) ma con riduzione capacità al 20%
+
+P10: come P5 (usa VRP) ma con riduzione/aumento capacità al 30%
+
+P11: come P9 ma usa EVV
+
+P12: come P10 ma usa EVV
+
+
+
+
+
+	
+
+ 

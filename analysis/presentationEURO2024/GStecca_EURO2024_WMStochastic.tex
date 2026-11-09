@@ -1,0 +1,561 @@
+\documentclass{beamer} % "Beamer" is a word used in Germany to mean video projector. 
+
+\usetheme{Madrid} % Search online for beamer themes to find your favorite or use the Berkeley theme as in this file.
+% \usecolortheme{beaver}
+ \usecolortheme{default}
+%\usecolortheme{seahorse}
+\usepackage{xcolor} % It may be necessary to set PCTeX or whatever program you are using to output a .pdf instead of a .dvi file in order to see color on your screen.
+\usepackage{graphicx} % This package is needed if you wish to include external image files.
+\usepackage{tkz-graph}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{eurosym}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{multirow}
+
+\setbeamercovered{transparent}
+
+\theoremstyle{definition} % See Lesson Three of the LaTeX Manual for more on this kind of "proclamation."
+\newtheorem*{dfn}{Definition}
+\newtheorem*{rmk}{Remark}
+
+\title[Stochastic Waste Collection]{The Waste Collection Vehicle Routing Problem with Stochastic Time Dependent Demand Increments}
+\author[Stecca, G.]{S. Mancini$^{\mathrm{a}}$, G. Stecca$^{\mathrm{b}}$, F. Vocaturo$^{\mathrm{c}}$} 
+\institute[CNR-IASI]{$^{\mathrm{a}}$Univeristà di Palermo \\ $^{\mathrm{b}}$Istituto di Analisi dei Sistemi ed Informatica ``Antonio Ruberti'' - Consiglio Nazionale delle Ricerche \\ $^{\mathrm{c}}$Università della Calabria}
+        \bigskip
+%        \includegraphics[scale=0.1]{iasicnr.png}
+        \bigskip
+\date[EURO2024]{Copenhagen - Denmark, 01/07/2024} 
+% Remove the % from the previous line and change the date if you want a particular date to be displayed; otherwise, today's date is displayed by default.
+
+\setbeamertemplate{itemize items}[triangle]
+\setbeamertemplate{enumerate items}[square]
+
+%\AtBeginSection[]  % The commands within the following {} will be executed at the start of each section.
+%{
+%\begin{frame} % Within each "frame" there will be one or more "slides."  
+%\frametitle{Presentation Outline} % This is the title of the outline.
+%\tableofcontents[currentsection]  % This will display the table of contents and highlight the current section.
+%\end{frame}
+%} % Do not include the preceding set of commands if you prefer not to have a recurring outline displayed during your presentation.
+
+\begin{document}
+
+\begin{frame} 
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Summary}
+
+\begin{block}{}
+  \begin{itemize}
+    \item Waste Collection and Variability
+    \item Problem Formulation
+    \item Preliminary Results
+    \item Policies, Conclusions, and Future Works
+   \end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Waste Management and Circular Economy}
+	\begin{block}{}
+		The European Green Deal establishes ambitious targets for reducing emissions within a medium-term timeframe. 
+		
+		European countries are committed to achieving carbon neutrality by 2050, with an interim goal of cutting emissions by 55\% by 2030 compared to 1990 levels. 
+		
+		Circular economy practices and \textbf{optimized waste management} play a crucial role in achieving these sustainable development objectives\footnote{https://commission.europa.eu/strategy-and-policy/priorities-2019-2024/story-von-der-leyen-commission/european-green-deal\_en}.
+	\end{block}
+\end{frame}
+
+\begin{frame}{Waste Collection and Stochastic Elements}
+  \begin{columns}
+    \column{0.5\textwidth}
+    \centering
+
+ %Cities and metropolitan areas are currently affected by elements contributing to stochastic elements to be taken into account in the waste collection planning.
+\begin{flushright}
+	 \begin{itemize}
+ 	\item Overtourism
+ \end{itemize}
+\end{flushright}
+ 
+  \vspace{12pt}
+       \includegraphics[scale=0.4]{images/smartwork.jpg}\\
+  \vspace{12pt}
+
+  \begin{itemize}
+ 	\item Growing (evolving) cities.
+ \end{itemize}
+ 
+ \vspace{12pt}
+
+ \column{0.5\textwidth}
+   \centering
+    \includegraphics[scale=0.4]{images/overtourism.jpg}\\
+    \vspace{12pt}
+    
+ 	 \begin{itemize}
+ 		\item Changing habits
+ 	\end{itemize}
+ 	
+
+	\vspace{12pt}
+
+     \includegraphics[scale=0.5]{images/growingtowns}\\
+    \vspace{12pt}
+
+
+   \end{columns}
+  \end{frame}
+  
+  
+  \begin{frame}{Waste Collection and Stochastic Elements}
+  	\begin{columns}
+  		\column{0.5\textwidth}
+%  		\centering
+		
+   		\begin{itemize}
+  			\item Unespected demand (during shifts)
+  			\item Process (vehicles) disruption
+  			\item Extra shifts
+  			\item Need for new planning policies
+  		\end{itemize}
+  		
+  		\vspace{12pt} 
+  		
+  		\column{0.5\textwidth}
+  		\centering
+  		\includegraphics[scale=0.4]{images/waste.png}\\
+  		\vspace{12pt}
+  		
+  		\includegraphics[scale=0.4]{images/truck.jpg}\\
+		\vspace{12pt}
+  				
+  		
+  		\includegraphics[scale=0.5]{images/bins.jpg}\\
+  		\vspace{12pt}
+  		
+  		
+  	\end{columns}
+  \end{frame}
+  
+  \begin{frame}{The Problem addressed - vehicle routing problem with stochastic time-dependent demand increments}
+  	
+  	\begin{block}{}
+  	
+  	A homogeneous fleet of vehicles must visit a set of collection points with the aim of removing waste.
+    \end{block}
+    \begin{block}
+  
+  	We divide the planning horizon (day) in not-overlapping time slots.
+    \end{block}
+	\begin{block}
+  	
+  	Each collection point must be visited exactly once during the planning horizon and it has a known initial demand which may increase along the day.  The (uncertain) demand increments are revealed upon arrival at the collection points.
+    \end{block}
+    \begin{block}
+  	
+  	The goal is to minimize the expected total cost which also considers a penalty for the residual quantity of waste accumulated for the next day.
+  \end{block}
+  \end{frame}
+  
+    \begin{frame}{Stochastic Vehicle Routing}
+  	\begin{block}{Team Orienteering - TOP}
+  	Waste collection routing problems with stochastic demand have been extensively	studied in the literature, mostly considering demand unknown but stationary. 
+  	
+  	Markov et al.\footnote{ I. Markov, M. Bierlaire, J.-F. Cordeau, Y. Maknoon, S. Varone, ``Waste collection inventory	routing with non-stationary stochastic demands'', Computers \& Operations Research 113, 104798 (2020)} deal with a demand varying on time. However, they consider a multi-period setting in which demands
+  	may increase from one period to another, but it is constant over the same period (routes span over a single period, then the exact quantity is know at the beginning of the daily plan). 
+  	
+  	Conversely, we study a single day setting, where the time-horizon is
+  	split in time-slots and routes can span over multiple time-slots. 
+  	\end{block}
+  \end{frame}
+  
+
+\begin{frame}{Problem Formulation}
+Let $m$ be the number of available vehicles and $G$ a direct graph. Nodes $1,...,n$ of $G$ represent the collection points, whereas node $0$ and nodes $n+1,...,n+m$ represent the central depot (same location). 
+\vspace{0.2cm}\\
+Sets:
+\begin{itemize}
+	\item $V=\{0,1,...,n,n+1,...n+m\}:$ set of all nodes
+	\item $V'=\{0,1,...,n\}=V\setminus\{n+1,...,n+m\}$ 
+	\item $V''=\{1,...,n,n+1,...n+m\}=V\setminus\{0\}$ 
+	\item $V'''=\{n+1,...n+m\}=V\setminus V'$ 
+	\item $S:$ set of scenarios
+	\item $T:$ set of periods
+\end{itemize}
+	
+\end{frame}
+
+\begin{frame}{The Problem - Parameters}
+	%\resizebox{\textwidth}{!}{
+ 	%\begin{tabular}{ll}
+	\begin{itemize}
+		\item[]  $C$ \quad   vehicle capacity \\
+		\item[] $c_{ij}$ \quad travel cost associated with arc $(i,j)$, $i\in V'$, $j\in V''$ ($j \neq i$) \\
+		\item[] $t_{ij}$  \quad travel time associated with arc $(i,j)$, $i\in V'$, $j\in V''$ ($j \neq i$). \\
+		%   \item $h_{i}:$ service time associated with node $i\in V'$, with $h_0=0$
+		\item[] $e^t$  \quad starting time of period $t\in T$ \\
+		\item[] $\ell^t$ \quad ending time of period $t\in T$ \\
+		\item[] $p$  \quad unit penalty cost for uncollected waste\\
+		\item[] $d_j$ \quad initial non-negative (deterministic) demand  $j=1,...,n$ \\
+		\item[] $\delta_{jt}^s$  \quad non-negative demand increment $j=1,...,n$, (beginning) $t\in T$  $s \in S$ \\
+		\item[] $M, T_{max}, Q_{max}$  \quad large constant \\
+	\end{itemize}
+
+	%\end{tabular}
+	%}  
+
+	\end{frame}
+
+
+
+\begin{frame}{Formulation: Variables}
+\begin{itemize}
+	\item [$x_{ij}$]: binary variable equal to 1 if a vehicle travels from node $i \in V' $ to node $j \in V''$ ($j\neq i$), $0$ otherwise (first stage routes)
+	\item [$U_{jt}$]: binary variable equal to 1 if node $j\in V''$ is visited in period $t \in T$
+	\item [$\bar{T}_j$]: arrival time at node $j\in V$ 
+	\item  [$y_{ij}^s$]: binary variable equal to 1 if a vehicle skips arc $(i,j)$ in scenario $s \in S$, $0$ otherwise 
+	\item [$Q_j^s$]: theoretical cumulative load at node $j\in V$ in scenario $s \in S$
+	\item [$R_j^s$]: quantity of waste exceeding the capacity at node $j=n+1,...,n+m$ in scenario $s \in S$
+	\item [$L_j^s$]: quantity of waste accumulated at collection point $j=1,...,n$ in scenario $s \in S$ in periods following its visit, and left over for the next day
+	\item [$\rho_j^s$]: binary variable equal to 1 if node $j=1,...,n$ is associated with  event ``capacity saturation'' in scenario $s\in S$, $0$ otherwise 
+	\item [$\alpha_j^s$]: binary variable equal to 1 if node $j$ is the first node associated with  event ``capacity saturation'' in scenario $s\in S$, $0$ otherwise
+\end{itemize}
+	
+\end{frame}
+
+	\begin{frame}{Formulation: Objective Function}
+		\begin{block}{}
+			$$
+			\min \quad  \sum_{i \in V'} \sum_{j \in V'' (j\neq i)} c_{ij} {x}_{ij} - \frac{1}{|S|} \sum_{s \in S} \sum_{i=1}^n \sum_{j \in V''(j\neq i)} c_{ij} {y}_{ij}^s + \frac{1}{|S|} \sum_{s \in S} \sum_{j=1}^n  c_{j0} \alpha_j^s + 
+			$$
+			\begin{equation}\label{of}
+				+ \frac{1}{|S|} \sum_{s \in S} \sum_{j=n+1}^{n+m}  p R_j^s + \frac{1}{|S|} \sum_{s \in S} \sum_{j=1}^n p L_j^s
+			\end{equation}
+			
+		\end{block}
+		
+	\end{frame} 
+
+
+	\begin{frame}{Formulation: Constraints (1/4)}
+	
+	\begin{block}{}
+		\begin{equation}\label{c1}
+			\sum_{j \in V''\setminus\{i\}} x_{ij} = \sum_{j \in V'\setminus\{i\}}x_{ji} = \sum_{t\in T}U_{it}, \quad i=1,...,n 
+		\end{equation}
+
+		\begin{equation}\label{c2}
+			\sum_{j \in V''}x_{0j} = m 
+		\end{equation}
+
+		\begin{equation}\label{c3}
+			\sum_{j \in V'} x_{ji} = 1, \quad i=n+1,...,n+m 
+		\end{equation}
+	
+		\begin{equation}\label{c4}
+			\sum_{t\in T}U_{jt}=1, \quad j\in V''
+		\end{equation}
+	
+		\begin{equation}\label{c5}
+			\bar{T}_0=0 
+		\end{equation}
+		
+		\begin{equation}\label{c5'}
+			\bar{T}_j \geq \bar{T}_i + t_{ij}-M(1-x_{ij}), \quad \ i \in V', j \in V''(j \neq i)
+		\end{equation}
+	\end{block}
+	
+	\end{frame}
+
+
+	\begin{frame}{Formulation: Constraints (2/4)}
+	
+	\begin{block}{}
+		\begin{equation}\label{c6}
+			e^t - T_{max} (1-U_{jt}) \leq \bar{T}_j \leq \ell^t + T_{max} (1-U_{jt}), \quad j \in V'', t \in T
+		\end{equation}
+		
+		\begin{equation}\label{c7}
+			Q_0^s =0, \quad  s \in S
+		\end{equation}
+		
+		\begin{equation}\label{c8}
+			Q_j^s \geq Q_i^s -M(1-x_{ij})+ d_j +\sum_{t\in T}\sum_{\tau=1}^t\delta_{j\tau}^sU_{jt}, \quad s \in S, i\in V', j=1,...,n  
+		\end{equation}
+		
+		\begin{equation}\label{c8.1}
+			Q_j^s \leq Q_i^s + M(1-x_{ij})+ d_j +\sum_{t\in T}\sum_{\tau=1}^t\delta_{j\tau}^sU_{jt}, \quad s \in S, i\in V', j=1,...,n   
+		\end{equation}
+
+	\end{block}
+	\end{frame}
+
+
+	
+
+\begin{frame}{Formulation: Constraints (3/4)}
+	\begin{block}{}
+		\begin{equation}\label{c9}
+			Q_i^s -M(1-x_{ij}) \leq	Q_j^s \leq Q_i^s + M(1-x_{ij}), \quad s \in S, i\in V''' 
+		\end{equation}
+		
+		\begin{equation}\label{c10}
+			R_j^s\geq Q_j^s - C , \quad s \in S, j=n+1,...,n+m 
+		\end{equation}
+		
+		\begin{equation}\label{c11}
+			R_j^s\geq 0, \quad s \in S, j=n+1,...,n+m 
+		\end{equation}
+		
+		\begin{equation}\label{c12}
+			L_j^s=\sum_{t\in T}\sum_{\tau=t+1}^{|T|}\delta_{j\tau}^sU_{jt}, \quad s \in S, j=1,...,n 
+		\end{equation}
+
+	\end{block}
+\end{frame}
+
+\begin{frame}{Formulation: Constraints (4/4)}
+	\begin{block}{}
+			
+			\begin{equation}\label{c14}
+			\frac{Q_j^s-C}{Q_{max}}	\leq \rho_j^s \leq 1-\frac{C-Q_j^s}{Q_{max}}, \quad s \in S, j = 1, \ldots ,n 
+			\end{equation}
+			
+			\begin{equation}\label{c15}
+				y_{ij}^s \leq \frac{1}{2}(x_{ij}+\rho_i^s), \quad s \in 	S, i=1,...,n, j \in V'' (j \neq i)
+			\end{equation}
+		
+			\begin{equation} \label{cy}
+				y_{0j}^s = 0, \quad s \in S, \quad j \in V''
+			\end{equation}
+		
+		\begin{equation} \label{cyalpha}
+			\alpha_j^s = \sum_{i \in V''}y_{ji}^s - \sum_{i \in V'}y_{ij}^s, \quad s \in S, \quad j = 1, \ldots, n
+		\end{equation}
+	\end{block}
+\end{frame}
+
+	\begin{frame}{Example}
+		\begin{figure}
+			\centering
+			\scalebox{0.8}{
+		\begin{tikzpicture}
+			\tikzset{
+				edge/.style = {->,> = latex', thick},
+				vertex/.style = {shape=circle,draw, fill=lightgray, thick}  % size of the circle diameter
+			}
+			\node[vertex] (n0) at  (0,0){0};
+			\node[vertex] (n1) at  (2, 2){1};
+			\node[vertex] (n2) at  (4, 2){2};
+			\node[vertex] (n3) at  (6, 0){3};
+			\node[vertex] (n4) at  (4, -2){4};
+			\node[vertex] (n5) at  (2, -2){5};
+			\node[vertex] (n6) at  (-2, -2){6};
+			\node[vertex] (n7) at  (-4, -2){7};
+			\node[vertex] (n8) at  (-6, 0){8};
+			\node[vertex] (n9) at  (-4, 2){9};
+			\node[vertex] (n10) at  (-2, 2){10};
+
+			\draw[edge] (n0) to node{} (n5);
+			\draw[edge] (n5) to node{} (n2);
+			\draw[edge] (n2) to node{} (n1);
+			\draw[edge, in=20, out=160, dashed] (n1) to node{} (n9);
+			\draw[edge,dashed] (n9) to node{} (n0);
+			\draw[edge, red] (n1) to node{} (n0);
+			\draw[edge] (n0) to node{} (n6);
+			\draw[edge] (n6) to node{} (n7);
+			\draw[edge] (n7) to node{} (n10);
+			\draw[edge, dashed] (n10) to node{} (n4);
+			\draw[edge, dashed] (n4) to node{} (n8);
+			\draw[edge, out=10, in=170, dashed] (n8) to node{} (n3);
+			\draw[edge, red] (n10) to node{} (n0);
+		\end{tikzpicture}
+		}
+		\caption{ Dashed arcs consider $y_{i,j}^s=1$, while red lines are the arcs connecting the vehicles to the depot}
+		\label{fig:solution}
+		\end{figure}
+	\end{frame}
+
+
+\begin{frame}{Computational Experiments: Some Instances}
+	\begin{table}[]
+		\centering
+		\caption{Instances data}
+		\label{tab:instances}
+		\scalebox{0.8}{
+		\begin{tabular}{lrrrr}
+			\hline
+			name        & I1\_S5 & I1\_S6    & I1\_S7    & I1\_S8    \\
+			\hline
+			n           & 10     & 10        & 10        & 10        \\
+			LT          & 3      & 3         & 3         & 3         \\
+			m           & 3      & 3         & 3         & 3         \\
+			LS          & 5      & 5         & 5         & 5         \\
+			C           & 60     & 100       & 100       & 100       \\
+			p           & 10     & 10        & 1         & 5         \\
+			Tmax        & 100    & 100       & 100       & 100       \\
+			Qmax        & 10000  & 10000     & 10000     & 10000     \\
+			M           & 10000  & 10000     & 10000     & 10000     \\
+			variability & medium & scattered & scattered & scattered\\
+			\hline
+		\end{tabular}
+		}
+	\end{table}
+\end{frame}
+
+\begin{frame}{Computational Experiments: Some Results}
+	\begin{table}[]
+		\centering
+		\caption{Results}
+		\label{tab:my-table}
+		\scalebox{0.7}{
+		\begin{tabular}{lrrrrrrrr}
+			\hline
+			Instance  & I1\_S4  & I1\_S4\_EEV & I1\_S6 & I\_6\_EEV & I1\_S7 & I1\_S7\_EEV & I1\_S8 & I1\_S8\_EEV \\
+			\hline
+			objValue      & 9552.03 & 9552.03     & 706.47 & 1004.74   & 131.42 & 173.70      & 387.00 & 603.35      \\
+			runtime       & 10800   & 0.01        & 10307  & 0         & 10800  & 0           & 5652   & 0           \\
+			gap           & 0.27    & 0.00        & 0.00   & 0.00      & 0.14   & 0.00        & 0.00   & 0.00        \\
+			Z1            & 71.69   & 66.04       & 67.53  & 66.29     & 67.53  & 66.29       & 67.53  & 66.29       \\
+			Z2            & 48.80   & 40.23       & 0.00   & 8.59      & 2.55   & 8.59        & 0.00   & 8.59        \\
+			Z3            & 12.76   & 9.83        & 0.00   & 8.59      & 2.55   & 8.59        & 0.00   & 8.59        \\
+			Z4            & 8803.04 & 8369.48     & 257.80 & 493.72    & 25.78  & 49.37       & 128.90 & 246.86      \\
+			Z5            & 713.34  & 1146.90     & 381.14 & 444.74    & 38.11  & 58.04       & 190.57 & 290.21      \\
+			Difference    &         & 0.00        &        & 42\%      &        & 32\%        &        & 56\%       \\
+			\hline
+		\end{tabular}
+		}
+	\end{table}
+\end{frame}
+
+\begin{frame}{Solution comments}
+	
+\begin{columns}
+	\column{0.4\textwidth}
+	Instance S\_6
+	\begin{itemize}
+		\item Stochastic
+		\begin{itemize}
+			\item $0 \rightarrow 1 \rightarrow 7 \rightarrow 10 \rightarrow 4 \rightarrow  12$
+			\item $0 \rightarrow 2 \rightarrow 3 \rightarrow 6 \rightarrow 11$
+			\item $0 \rightarrow 8 \rightarrow 9 \rightarrow 5 \rightarrow 13$
+		\end{itemize}
+		\item EEV
+		\begin{itemize}
+			\item $0 \rightarrow 1 \rightarrow 7 \rightarrow 10 \rightarrow 9 \rightarrow  11$
+			\item $0 \rightarrow 5 \rightarrow 2 \rightarrow 3 \rightarrow 6 \rightarrow 13$
+			\item $0 \rightarrow 8 \rightarrow 4 \rightarrow 12$
+		\end{itemize}
+	\end{itemize}
+	
+	\column{0.6\textwidth}
+	\centering
+	\includegraphics[scale=0.3]{images/plot\_S6\_stochastic.png}\\
+
+	
+	\includegraphics[scale=0.3]{images/plot\_S6\_fix.png}\\
+
+	
+	
+	
+	
+	\end{columns}
+	
+\end{frame}
+
+
+\begin{frame}{Realistic Instance - Different classes of customers}
+\begin{table}[]
+	\centering
+	%\caption{}
+	\label{tab:realinstance}
+	\begin{tabular}{l|l|llll}
+		\hline
+		& demand   & \multicolumn{4}{c}{delta}              \\
+		\hline
+		&          & 8-12     & 12-16  & 16-20     & 20-24  \\
+		\hline
+		home       & medium   & medium   & low    & low       & medium \\
+		school     & very low & low      & medium & high      & low    \\
+		restaurant & high     & very low & medium & very high & medium \\
+		
+		bar        & low      & high     & high   & high      & high \\
+		\hline 
+	\end{tabular}
+\end{table}
+\end{frame}
+
+
+\begin{frame}{Realistic Instance}
+	\begin{center}
+		\includegraphics[scale=0.35]{images/real\_instance.jpg}
+	\end{center}
+\end{frame}
+
+\begin{frame}{Realistic Instance: results and comments}
+	
+\begin{table}[]
+	\centering
+	\caption{results realistic instance}
+	\label{tab:resreal}
+	\scalebox{0.8}{
+	\begin{tabular}{lll}
+		\hline
+		Inst name      & I1\_R2        & I1\_R2\_EEV \\
+		\hline
+		objValue       & 9496.31       & 10070.03    \\
+		Z1             & 12607.92      & 11657.46    \\
+		Z2             & 9677.65       & 5875.45     \\
+		Z3             & 570.04        & 1444.02     \\
+		Z4             & 3540.00       & 1794.00     \\
+		Z5             & 2456.00       & 1050.00     \\
+		\hline
+		\multicolumn{2}{l}{Difference} & 6.04\%  \\
+		\hline    
+	\end{tabular}
+	}
+\end{table}
+	\begin{itemize}
+
+		\item different path / end of shift stratgy
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Policies \& Conclusion}
+	\begin{itemize}
+		\item waste collection / waste management important for urban grow and sustainability
+		\item cities evolves, dynamics and uncertainty to manage in order to offer proper services
+		\item New stochastic model for waste collection
+		\item Difficult to solve $\rightarrowtail$ policies can be designed.
+	\begin{itemize}
+		\item  lower capacity for vehicles
+		\item try to serve farthest users as last (fair?)
+		\item late collection 
+	\end{itemize}
+	\end{itemize}
+	\vspace{20pt}
+
+	
+\end{frame}
+
+\begin{frame}{Conclusion}
+\begin{center}
+	\textbf{Thank You!}\\
+	\vspace{15pt}
+	Giuseppe Stecca\\
+	giuseppe.stecca@iasi.cnr.it\\
+	\vspace{20pt}
+	\includegraphics[width=2.5cm]{images/iasicnr} \\
+	\vspace{10pt}
+
+\end{center}
+\end{frame}
+\end{document}
+

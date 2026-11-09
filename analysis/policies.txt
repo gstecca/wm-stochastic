@@ -1,0 +1,12 @@
+Ciao a tutti, inizio a condividere con voi alcune idee che mi sono venute a proposito delle policies per costruire rotte di primo livello.
+
+1) risolvere un VRP con una capacità del veicolo ridotta del x%
+
+2) risolvere un VRP in cui massimizziamo la somma pesata di distanza_del_nodo_dal_deposito * posizione_del_nodo nella rotta (tenderà a mettere per ultimi i nodi più lontani in modo da poterli skippare)
+
+3) massimizzare la quantità raccolta (cercando di servire tutti il più tardi possibile)
+
+4) mischiare gli approcci ad esempio considerando capacità ridotta per alcuni veicoli (creando rotte safe) e utilizzare la
+Policy 2 per le altre rotte
+
+

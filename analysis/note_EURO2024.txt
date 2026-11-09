@@ -1,0 +1,21 @@
+1207. The Waste Collection Vehicle Routing Problem with Stochastic Time Dependent Demand Increments in session MA-35: Robust and Stochastic Routing Problems, stream Stochastic, Robust and Distributionally Robust Optimization.
+Monday, 8:30-10:00 - Room: 44 (building: 303A)
+
+3181. A Bi-Level Optimization Model for Congestion and Emission Control in Transportation Networks in session WD-53: Carbon Taxing and Emissions Controls, stream Sustainable and Resilient Systems.
+Wednesday, 14:30-16:00 - Room: 8007 (building: 202)
+
+
+
+Abstract
+
+We focus on a vehicle routing problem with stochastic time-dependent demand increments.
+In this problem, a homogeneous fleet of vehicles must visit a set of collection points with the aim of removing waste.
+We divide the planning horizon (day) in not-overlapping time slots.
+Each collection point must be visited exactly once during the planning horizon and it has a known initial demand which may increase along the day. In fact, for each collection point and for each time slot, additional demand may arise. The (uncertain) demand increments are revealed upon arrival at the collection points.
+The goal is to minimize the expected total cost which also considers a penalty for the residual quantity of waste accumulated at the collection points after they have been visited. We present a two-stage stochastic program and discuss specific recourse policies for the problem under study.
+
+Keywords
+
+    Vehicle Routing
+    Programming, Stochastic
+    OR in Sustainability

@@ -1,0 +1,29 @@
+funzione obiettivo:
+ forse dovremmo considerare la minimizzazione della quantità di rifiuto lasciata a terra e fine time horizon?
+cosa decidiamo nei due stages? 
+
+
+30/06/2025
+TODO: cambiare tabelle 3 e 4 mettendo i risultati di quelle con gap <= 0.1%
+FATTO: estrarre features di tutte le istanze con gap <= 0.1% (sono 548)
+TODO: calcolare il VSS sulle 548 istanze
+TODO: far rigirare la policy selezionata su tutte le istanze con gap <= 0.1%
+
+
+
+
+\color{red} 
+Tabella con risultati di tutte e 720 le istanze, raggruppate per n. clienti, capacità mostrando in particolare VSS min, media, max. numero risolte, numero non risolte, gap medio, minimo e max di quelle risolte, tempi dello stocastico, tempi dell' EVV (deterministico)
+
+Per testare le policies abbiamo scelto le istanze per le quali lo stocastico è marcatemente migliore rispetto a quello deterministico. L'obiettivo è cercare un giusto trade off tra tempi del deterministico e perferomances dello stocastico. A tal fine scegliamo il sottoinsieme di istanze che siano "sfidanti" da questo punto di vista.
+
+solved with gap $< 0.1\%: 548$
+
+solved with gap $< 0.1\%$ and with $VSS >= 4\%: 178$
+
+Discutere tempi su stocastico vs. tempi sul deterministico (EVV)
+
+mettere in tabella i risultati delle policies con in particolare gap e tempi
+
+
+TODO: citare che EEV ha un gap di 64.8\%}

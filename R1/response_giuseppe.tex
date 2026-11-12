@@ -18,38 +18,19 @@
 3. Provide valid numerical bounds for $M$ and $Q_{max}$, and clarify the saturation convention when cumulative load equals vehicle capacity in constraints (17)--(18).
 \end{comment}
 
-We thank the Reviewer for this comment. In the revised manuscript we now give valid bounds for the big constants, report the values used in the experiments, and state the saturation convention explicitly (new paragraph after the description of constraints (17)--(18) and new entries in Table~2). Let $q^s_j(U)=d_j+\sum_{t\in T}\sum_{\tau=1}^{t}\delta^s_{j\tau}U_{jt}$ be the quantity available at collection point $j$ when it is visited, and let
-\[
-\bar Q=\max_{s\in S}\ \sum_{j=1}^{n}\Big(d_j+\sum_{t\in T}\delta^s_{jt}\Big)
-\]
-be the total waste that can appear in a scenario. Along every route the theoretical cumulative load is a partial sum of the $q^s_j$, so $0\le Q^s_j\le\bar Q$ for every $j\in V$ and $s\in S$.
-
+We thank the Reviewer for this comment. Let $\bar Q=\max_{s\in S}\sum_{j=1}^{n}\big(d_j+\sum_{t\in T}\delta^s_{jt}\big)$ be the total waste that can appear in a scenario, so that $0\le Q^s_j\le\bar Q$ for every node and scenario. Then:
 \begin{itemize}[leftmargin=*]
-\item \emph{Constant in (7).} In (7) the constant only needs to deactivate a time constraint. Since $\bar T_i\le \ell_{|T|}=T_{max}$ for every node (constraints (8)), $M_7=T_{max}+\max_{(i,j)}t_{ij}$ is always valid. In our instances travel times are Euclidean distances (triangle inequality holds) and service times are zero. Every node $i$ must then satisfy $\bar T_i+t_{i0}\le T_{max}$ (the route has to reach its final depot copy by $T_{max}$), and every node $j$ satisfies $\bar T_j\ge t_{0j}$. Hence $\bar T_i+t_{ij}-T_{max}\le t_{ij}-t_{i0}\le t_{0j}\le\bar T_j$, so the tighter value $M_7=T_{max}$ is also valid. This is the value used in our code, and it coincides with the constant already used in (8).
-
-\item \emph{Constant $M$ in (10)--(13).} If $x_{ij}=0$, constraint (10) reads $Q^s_j\ge Q^s_i-M+q^s_j$, which is redundant when $M\ge\bar Q$, because $Q^s_i\le\bar Q$ and $Q^s_j\ge q^s_j$. Similarly, (11) reads $Q^s_j\le Q^s_i+M+q^s_j$, which is redundant because $Q^s_j\le\bar Q\le M$. The same argument applies to (12)--(13). Therefore $M\ge\bar Q$ is valid. With the generation procedure of Section 5.1 ($d_j\le 30$ and $\delta^s_{jt}\le 75$) we have the a priori bound $\bar Q\le 255\,n$. Over the 720 instances the actual value of $\bar Q$ ranges between 549 and 1024.
-
-\item \emph{Constant $Q_{max}$ in (17)--(18).} Constraint (17) forces $\rho^s_j=1$ whenever $Q^s_j>C$, provided that $(Q^s_j-C)/Q_{max}\le 1$, i.e.\ $Q_{max}\ge\bar Q-C$. Constraint (18) forces $\rho^s_j=0$ whenever $Q^s_j<C$, and remains feasible when $\rho^s_j=0$ provided that $(C-Q^s_j)/Q_{max}\le 1$, i.e.\ $Q_{max}\ge C$. A valid choice is therefore $Q_{max}\ge\max\{C,\ \bar Q-C\}$. Over our instances this value never exceeds 874.
-
-\item \emph{Values used and numerical safety.} In all experiments we used $M=Q_{max}=10^4$, which satisfies the bounds above in every instance. Because $Q_{max}$ appears as a divisor, we also checked that this value does not create numerical ambiguity. The data are integer in the SM, and multiples of $0.5$ in the EM and in the capacity-adjusted policies (expected increments $12.5$, $37.5$, $62.5$; capacities such as $0.85\,C$). Hence, whenever $Q^s_j\neq C$, we have $|Q^s_j-C|/Q_{max}\ge 5\cdot10^{-5}$, which is larger than the default integrality tolerance of Gurobi ($10^{-5}$). Constraints (17)--(18) therefore always identify $\rho$ correctly.
-
-\item \emph{Saturation convention when $Q^s_j=C$.} As stated in Section~3.2, a vehicle is saturated at $j$ when its residual capacity is insufficient \emph{or} when the demand at $j$ fully saturates it. The convention is therefore $Q^s_j\ge C$: when $Q^s_j=C$ the vehicle loads all the waste at $j$ and then returns to the depot. In formulation (17)--(18), the case $Q^s_j=C$ gives $0\le\rho^s_j\le1$, so $\rho^s_j$ is not fixed by the constraints. However, this freedom never changes the optimal value:
- \begin{itemize}
- \item if $j$ is followed on its route by another collection point $k$, then $Q^s_k>C$ (all initial demands are positive), so the vehicle is saturated at $k$ anyway. The waste left uncollected, i.e.\ $R^s$ in (14), is the same in both cases, while the travel cost differs by $c_{jk}+c_{k0}-c_{j0}\ge0$ in favour of $\rho^s_j=1$ (triangle inequality). A minimisation objective therefore selects $\rho^s_j=1$ (see also our answer to Comment~2 on constraint (19));
- \item if $j$ is the last collection point of the route, skipping the arc $(j,n+h)$ saves $c_{j0}$ and adds the return cost $c_{j0}$, so both values of $\rho^s_j$ give the same cost.
- \end{itemize}
- We verified this on all 597 SM solutions: the case $Q^s_j=C$ occurs 137 times. In all 32 cases in which $j$ is followed by another collection point, the solver sets $\rho^s_j=1$ and the remaining arcs are skipped. $\rho^s_j=0$ occurs only in the 42 cases in which $j$ is the last point of the route, where the choice is cost-neutral. For readers who prefer the convention to be fixed by the constraints themselves, we also report in the paper the equivalent variant
- \[
- \rho^s_j\ \ge\ \frac{Q^s_j-C+\varepsilon}{Q_{max}},\qquad \rho^s_j\ \le\ 1-\frac{C-Q^s_j}{Q_{max}},\qquad Q_{max}\ge\max\{C,\ \bar Q-C+\varepsilon\},
- \]
- where $\varepsilon>0$ is the data granularity ($\varepsilon=0.5$ in our instances). This variant gives $\rho^s_j=1$ if and only if $Q^s_j\ge C$.
+\item constraints (10)--(13) are valid for $M\ge\bar Q$;
+\item constraints (17)--(18) are valid for $Q_{max}\ge\max\{C,\bar Q-C\}$: (17) forces $\rho^s_j=1$ when $Q^s_j>C$ and (18) forces $\rho^s_j=0$ when $Q^s_j<C$;
+\item in (7) the code uses $T_{max}$, which is valid because travel times are Euclidean and service times are zero.
 \end{itemize}
+In our instances $\bar Q\le 1024$, so the value $M=Q_{max}=10^4$ used in the experiments is always valid. It is also not large enough to cause numerical problems: since the data are integers or multiples of $0.5$, whenever $Q^s_j\neq C$ the term $|Q^s_j-C|/Q_{max}$ is at least $5\cdot10^{-5}$, above the integrality tolerance of Gurobi ($10^{-5}$). As a check, we re-solved a sample of 332 of the 548 instances solved to optimality (all those with $n\in\{5,6\}$ and 35 random ones with $n\in\{7,8\}$; 629 SM and EM runs in total) with the smallest valid values ($M=\bar Q$, $Q_{max}=\max\{C,\bar Q-C\}$): all optimal values coincide (relative difference below $5\cdot10^{-6}$), and computing times decrease slightly ($-11\%$ in total).
 
-\noindent\textbf{Changes in the manuscript.} Table~2: the row ``$M, Q_{max}$ -- large constants'' is replaced by
-\rev{``$M$ -- large constant in (10)--(13), $M\ge\bar Q=\max_{s}\sum_{j}(d_j+\sum_t\delta^s_{jt})$; \ $Q_{max}$ -- large constant in (17)--(18), $Q_{max}\ge\max\{C,\bar Q-C\}$''}, and in (7) $M$ is replaced by $T_{max}$. After the description of constraints (17)--(18) we add:
+When $Q^s_j=C$, the vehicle is considered saturated, consistently with Section~3.2: it loads the whole demand of $j$ and returns to the depot. In this case (17)--(18) leave $\rho^s_j$ free, but setting $\rho^s_j=1$ is never more costly (triangle inequality), so the optimal value is not affected. In our 597 SM solutions, whenever $Q^s_j=C$ and $j$ is followed by another collection point, the solver sets $\rho^s_j=1$; $\rho^s_j=0$ only occurs when $j$ is the last point of its route, where the two choices have the same cost.
 
+\noindent\textbf{Changes in the manuscript.} In constraint (7), $M$ is replaced by $T_{max}$, which is the value used in our code and the same constant already used in (8); $M$ remains the large constant of (10)--(13). In Table~3 the notation is now defined accordingly. After constraints (17)--(18) we add:
 \begin{quote}\rev{%
-Constraints (17)--(18) are valid when $Q_{max}\ge\max\{C,\bar Q-C\}$, where $\bar Q=\max_{s\in S}\sum_{j=1}^n(d_j+\sum_{t\in T}\delta^s_{jt})$ is an upper bound on any cumulative load. Likewise, constraints (10)--(13) are valid for $M\ge\bar Q$. Since travel times satisfy the triangle inequality and service times are null, $T_{max}$ is a valid constant in (7). In our experiments we set $M=Q_{max}=10^4$, which satisfies these bounds for all instances ($\bar Q\le 1024$), and the minimum non-zero value of $|Q^s_j-C|/Q_{max}$ is above the solver integrality tolerance. If $Q^s_j>C$, then (17) forces $\rho^s_j=1$; if $Q^s_j<C$, then (18) forces $\rho^s_j=0$. If $Q^s_j=C$, the vehicle is considered saturated (consistently with Section~3.2): it loads the whole demand of $j$ and returns to the depot. In this case (17)--(18) leave $\rho^s_j$ free, but setting $\rho^s_j=1$ is never more costly because of the triangle inequality, so the optimal value is not affected. The convention can be imposed explicitly by replacing the numerator of (17) with $Q^s_j-C+\varepsilon$, where $\varepsilon>0$ is the granularity of the demand data.}
+Constraints (\ref{c9})-(\ref{c9.1}) and (\ref{c13})-(\ref{c14}) are valid for $M\ge\bar Q$ and $Q_{max}\ge\max\{C,\bar Q-C\}$, respectively, where $\bar Q=\max_{s\in S}\sum_{j=1}^n(d_j+\sum_{t\in T}\delta^s_{jt})$ bounds any cumulative load. In our experiments we set $M=Q_{max}=10^4$; re-solving a sample of 332 instances with the smallest valid values gives the same optimal values. When $Q^s_j=C$ the vehicle is considered saturated; (\ref{c13})-(\ref{c14}) let in this case $\rho^s_j$, but $\rho^s_j=1$ does not imply higher cost, thus the optimal value is not affected.}
 \end{quote}
 
 \note{Comment 2 (Francesca) discusses why (19) does not force $y=1$; the triangle-inequality argument above is the same one, so the two answers should cross-reference each other. Script used for the empirical check: \texttt{wm-collection-stochastic} repository, files \texttt{results/sm/*}.}
@@ -59,20 +40,20 @@ Constraints (17)--(18) are valid when $Q_{max}\ge\max\{C,\bar Q-C\}$, where $\ba
 4. Reconcile the reported average VSS of 21.33\% with Table 5. Weighting the displayed group averages by their respective numbers of solved instances gives approximately 27.02\%. Please verify the calculation and update the discussion and conclusions accordingly.
 \end{comment}
 
-We thank the Reviewer for checking the figures so carefully. The Reviewer's computation is correct: weighting the group averages of Table~5 by the number of solved instances gives 27.02\%. We traced the inconsistency back to two errors in the aggregation of the results, both now corrected:
+We thank the Reviewer for checking the figures so carefully. The Reviewer's computation is correct: weighting the group averages of Table~5 (Table~6 in the revised manuscript) by the number of solved instances gives 27.02\%. We traced the inconsistency back to two errors in the aggregation of the results, both now corrected:
 \begin{enumerate}[leftmargin=*]
-\item the group averages $VSS_a$ (and $gap_a$) in Table~5 were computed only over the instances with a strictly positive value, i.e.\ instances with $VSS=0$ (where EM and SM give the same solution value) were excluded from the average. This inflates the group averages, and therefore also the 27.02\% obtained by weighting them;
+\item the group averages $VSS_a$ (and $gap_a$) in Table~6 were computed only over the instances with a strictly positive value, i.e.\ instances with $VSS=0$ (where EM and SM give the same solution value) were excluded from the average. This inflates the group averages, and therefore also the 27.02\% obtained by weighting them;
 \item the overall value 21.33\% was computed over the 548 instances solved with an optimality gap of at most 0.1\% (the same set used in Section~5.3), and not over the 597 instances as stated in the text.
 \end{enumerate}
-In the revised manuscript Table~5 is recomputed over \emph{all} instances with a feasible solution, including those with $VSS=0$. We also add a column with the number of instances with a positive VSS. The overall figures are now:
+In the revised manuscript Table~6 is recomputed over \emph{all} instances with a feasible solution, including those with $VSS=0$. We also add a column with the number of instances with a positive VSS. The overall figures are now:
 \begin{itemize}[leftmargin=*]
 \item average VSS over the 597 instances with a feasible solution: \textbf{19.65\%}. This value coincides with the average of the revised group values weighted by the number of solved instances;
 \item average VSS over the 548 instances solved with gap $\le 0.1\%$, for which both $SM_{obj}$ and $EM_{obj}$ are certified: \textbf{21.33\%}. For the remaining 49 instances (all with $n=8$) the average is 0.86\%;
 \item the VSS is positive in 356 of the 597 instances (59.6\%), with an average of 32.96\% over these instances, and is zero in 241 instances. The distribution is strongly skewed (median 0.12\%, maximum 581.79\%): large values are concentrated in the groups with large capacity and few collection points.
 \end{itemize}
-The qualitative conclusions do not change. The revised averages still increase with the vehicle capacity for every value of $n$, and uncertainty is relevant for a large share of the instances. We have updated the discussion of Section~5.2 and the conclusions accordingly. For full transparency, the per-instance values and the script that recomputes Table~5 are available in the public repository (see our answer to Reviewer~3).
+The qualitative conclusions do not change. The revised averages still increase with the vehicle capacity for every value of $n$, and uncertainty is relevant for a large share of the instances. We have updated the discussion of Section~5.2 and the conclusions accordingly. For full transparency, the per-instance values and the script that recomputes Table~6 are available in the public repository (see our answer to Reviewer~3).
 
-\noindent\textbf{Changes in the manuscript.} Table~5 is replaced by:
+\noindent\textbf{Changes in the manuscript.} Table~6 is replaced by:
 
 \begin{table}[h]\centering\small\color{blue}
 \setlength{\tabcolsep}{3.2pt}
@@ -97,16 +78,16 @@ $n$ & $C$ & feasible & $VSS_a$ & $VSS_M$ & $\#VSS{>}0$ & $time_a$ & $time_M$ & $
 \multicolumn{2}{l}{all} & 597/720 & 19.65 & 581.79 & 356 \\
 \bottomrule
 \end{tabular}
-\caption*{\color{blue}Table 5: Results for groups of instances with the same number of collection points and vehicle capacity. Averages are computed over all instances with a feasible solution (including those with $VSS=0$). Gaps are relative MIP gaps (fractions).}
+\caption*{\color{blue}Table 6: Results for groups of instances with the same number of collection points and vehicle capacity. Averages are computed over all instances with a feasible solution (including those with $VSS=0$). Gaps are relative MIP gaps (fractions).}
 \end{table}
 
-\noindent In Section~5.2 the description of $VSS_a$ becomes \rev{``the average percentage value for VSS over the instances with a feasible solution, including those for which $VSS=0$ ($VSS_a$)''}; we add \rev{``the number of instances with a strictly positive VSS ($\#VSS{>}0$)''}; and the last sentence of the section is replaced by:
+\noindent In Section~5.2 the column ``solved'' becomes ``feasible'', the description of $VSS_a$ becomes \rev{``the average percentage value for VSS over the instances with a feasible solution, including those for which $VSS=0$ ($VSS_a$)''}; we add \rev{``the number of instances with a strictly positive VSS ($\#VSS{>}0$)''}; and the last sentence of the section is replaced by:
 
 \begin{quote}\rev{%
 Finally, over the 597 instances for which a feasible solution was found, the average percentage VSS is 19.65\%. It rises to 21.33\% on the 548 instances solved with an optimality gap not greater than 0.1\%, for which the VSS is computed from certified values. The VSS is strictly positive in 356 instances (59.6\%), where it averages 32.96\%, while in the remaining 241 instances the expected-value solution performs as well as the stochastic one. The distribution is therefore highly skewed (median 0.12\%), with the largest values concentrated in the instances with few collection points and large capacity.}
 \end{quote}
 
-\noindent In the Conclusions, ``it is highlighted by an average value of the stochastic solution of 21.33\%'' is replaced by \rev{``it is highlighted by an average VSS of 19.65\% over the 597 instances with a feasible solution (21.33\% over the 548 instances solved to near-optimality), with a positive VSS in about 60\% of the instances and peaks above 500\%''}.
+\noindent In the Conclusions, the sentence reporting the average VSS now reads: \rev{``On this subset, the average estimated VSS-type measure was 19.65\% (21.33\% on the 548 instances solved to near-optimality), and it was positive in about 60\% of the instances, suggesting that explicitly accounting for demand uncertainty can provide benefits over the expected-value approach.''}
 
 \note{(a) The ``Finally, we report that on all 597 solved instances \dots 21.33'' sentence is also Reviewer~3's last comment on the Conclusions (Simona): the answer there should match the numbers above. (b) The old $gap_a$ column also averaged only positive gaps: e.g.\ $n=8$, $C=150$ goes from 0.68 to 0.47. The gaps are fractions (0.47 = 47\%); the caption now says so. (c) All 123 ``not solved'' instances are in fact \emph{proven infeasible} by Gurobi (status INFEASIBLE in the logs), not instances without a primal bound within the time limit as stated in Section~5.2. 120 of them have the depot in the lower-left corner and $T_{max}=15$, so the round trip to the farthest collection point is longer than $T_{max}$. The other 3 are \texttt{I3\_N6\_M3\_T15\_C\{150,200,250\}\_DepCentral\_s1}. This directly answers Reviewer~3 (``distinguish instances for which no feasible solution was found from those proven infeasible'', Simona), and the definition of ``solved'' in Section~5.2 must be corrected. I used ``feasible'' in the revised table header for this reason.}
 
@@ -151,7 +132,7 @@ We thank the Reviewer for this suggestion, which we have fully implemented. All 
 \item the 720 instances and, for each of them, the expected-value instance used by the EM and by the policies;
 \item the instance-generation code. Running it regenerates all the instance files exactly; we verified the match sheet by sheet against the files used in the paper;
 \item the per-instance solutions of the SM, of the EM, of the EM routes evaluated on the scenarios ($EM_{obj}$), and of the 12 policies on the 178 instances of Section~5.3 (routes, visit periods, arrival times, loads, skipped arcs and the components of the objective);
-\item summary tables with one row per instance (and per instance--policy pair), the ML dataset (features and policy values), and a script that recomputes Table~5;
+\item summary tables with one row per instance (and per instance--policy pair), the ML dataset (features and policy values), and a script that recomputes Table~6;
 \item the optimisation code (Python/Gurobi).
 \end{itemize}
 The documentation (README) describes the file format sheet by sheet, the parameters and their units, and the demand-generation procedure, including the order of the random draws, the distribution of each increment class, the assignment of collection-point types and the dependence structure. It also lists the random seeds: Python's \texttt{random} module is reset with seeds 0--4 before each instance. As explained there, for a given number of collection points and seed, the locations and demands are shared by the 36 combinations of fleet size, capacity, time horizon and depot position. The repository is referenced in Section~5.1 and in a new Data Availability statement:

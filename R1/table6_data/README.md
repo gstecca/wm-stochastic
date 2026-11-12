@@ -1,0 +1,21 @@
+# Data behind the results table (Table 5 in the submitted paper, Table 6 in R1)
+
+- `Instances_list.xlsx`: one row per instance (720 rows). Copy of `analysis/Instances_list.xlsx`.
+  - **Columns:**
+    - `solved`: a feasible solution was found.
+    - `objVal`, `runTime`, `gap`: the stochastic model, SM.
+    - `EVV`, `runTimeEEV`, `gapEEV`: the SM with first-stage decisions fixed to the expected-value solution, i.e. EM_obj.
+    - `VSS`: percentage VSS.
+  - **Units:** gaps are fractions (0.47 = 47%), and times are in seconds.
+- `analisi_risultati_totali.ipynb`: the notebook that produced the submitted table.
+  - Cell 4 is the table itself.
+  - Cells 8 and 11 compute the 21.33%.
+  - It reads `Instances_list.xlsx` from its own folder.
+- `Instances_list_agg_NC_original_table5.xlsx`: the notebook's output, i.e. the submitted table.
+- `recompute_table6.py`: prints both versions of the table and the overall figures. Run it with `python recompute_table6.py` in this folder; it needs `pandas` and `openpyxl`.
+  - **Original:** every average is taken only over strictly positive values (`x[x > 0].mean()`). This is the error found by Reviewer 1: weighting these averages gives 27.02%.
+  - **Corrected:** every average is taken over all instances with a feasible solution.
+  - **Overall figures:**
+    - Mean VSS: 19.65% over the 597 instances with a feasible solution, and 21.33% over the 548 with gap ≤ 10⁻⁴.
+    - 356 instances have VSS > 10⁻⁶, averaging 32.96%.
+    - The median is 0.12%.

@@ -1,0 +1,600 @@
+\documentclass[11pt]{article}
+\usepackage[english]{babel}
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{xcolor}
+
+\newcommand{\dl}[1]{\textcolor{red}{\textbf{DL:} #1}}
+\newcommand{\remove}[1]{}
+
+\date{}
+
+%===============================================================================
+\begin{document}
+	
+	\begin{center}
+		{\bf \Large Response to the Reviewers}\\\vspace{0.5cm}
+		{\large The waste collection routing problem with time-varying\\ stochastic demand: A machine learning based approach\\  (Ms. Ref. No.:  CAIE-D-26-05414)}\vspace{0.5cm}
+	\end{center}
+	
+	We would like to thank the Associate Editor and the Reviewers for allowing us to submit an improved version of our paper.
+ 
+	We have carefully considered all of the	suggestions and addressed all concerns. In the following, we provide our response to the two Reviewers (whose comments appear in \textbf{boldface}). The modified text in the revised manuscript appears in \textcolor{blue}{blue font}.
+
+     We hope this new version will be appreciated.\vspace{5mm}
+	
+\newpage
+
+%===============================================================================
+	\section*{Reviewer \#1}
+
+\vspace{3mm}
+
+    \textbf{The paper addresses a relevant waste collection routing problem by combining intraday
+stochastic demand modelling with machine learning for policy selection. The approach is
+promising, and the paper merits publication after the following revisions.}
+
+	\begin{enumerate}
+	\item \textbf{Please proofread the manuscript carefully. For example, replace “Firt-stage” with “First-stage,”
+“A such feature” with “Such a feature,” and “the trained model predict” with “the
+trained model predicts.” Check subject–verb agreement, articles, and terminology
+throughout.}
+
+	\vspace{1mm}
+\noindent\textbf{Response:} We proofread the manuscript carefully. 
+These and other typos were corrected. Thanks! 
+   
+	\item \textbf{Clarify how constraint (19) ensures mandatory skipping after capacity saturation. Its
+upper bound permits the skipping variable to remain zero even when the corresponding
+arc is selected and saturation occurs. Explain whether the objective function guarantees
+the intended behaviour under stated cost assumptions, or introduce the necessary
+complementary constraint.} 
+	
+	\vspace{1mm}
+	Francesca
+    We thank the Reviewer for the comment and we agree for the need to better clarify... 
+	 
+	 \item \textbf{Provide valid numerical bounds for M and Qmax, and clarify
+the saturation convention when cumulative load equals vehicle capacity in constraints
+(17)–(18).}
+     
+\vspace{1mm}
+    Giuseppe
+	
+	 
+	 \item \textbf{Reconcile the reported average VSS of 21.33\% with Table 5. Weighting the displayed
+group averages by their respective numbers of solved instances gives approximately
+27.02\%. Please verify the calculation and update the discussion and conclusions
+accordingly.}
+	
+	  \vspace{1mm}
+Giuseppe
+	 
+	 \item \textbf{Moderate claims concerning generalisation and practical scalability. The experiments
+involve five to eight collection points, five demand scenarios, and 63 test instances for
+the machine learning assessment. These limitations should be acknowledged explicitly.}
+	 
+	 \vspace{1mm}
+Francesca
+	
+	  \item \textbf{Strengthen the discussion of stochastic routing and recourse approaches by considering
+the following relevant references. Explain how the manuscript’s intraday demand
+modelling and policy selection distinguish its contribution from these studies.\\
+* Jammeli, H., Argoubi, M., \& Masri, H. (2021). “A Bi-objective stochastic programming
+model for the household waste collection and transportation problem: case of the city of
+Sousse.” Operational Research, 21, 1613–1639. https://doi.org/10.1007/s12351-019-
+00538-5\\
+* Masri, H., Ben Abdelaziz, F., \& Alaya, H. (2016). “A Recourse Stochastic Goal
+Programming Approach for the Multi-objective Stochastic Vehicle Routing Problem.”
+Journal of Multi-Criteria Decision Analysis, 23(1–2), 3–14.
+https://doi.org/10.1002/mcda.1563}
+	 
+	 \vspace{1mm}
+	Francesca
+\end{enumerate}
+ 
+ 
+\newpage
+	%===============================================================================
+	\section*{Reviewer \#2}
+ 
+	\vspace{3mm}
+
+\textbf{The topic of the paper is interesting and the overall idea can be methodologically useful for other type of problems as well. But I have some reservations about the paper.}
+
+
+\begin{enumerate}
+\item \textbf{First of all, the main distinction of the paper is stated as the intra-day nature of the
+stochasticity they model. However, this distinction should be explain in a much sharper
+way. The time-dependent nature mentioned from the literature which is around the
+concept stochasticity across days, rather than intra-day, methodologically could be similar
+to represent. What is the mathematical difference and therefore the challenge associated with intra-day with respect to those that assume stochastocitiy across days? This needs to be clarified from a mathematical formulation point of view in order to justify the
+contribution claims. Related to the contributions, Table 1 is a little misleading I think. For example, Markov et
+al. also consider time dependency but not visible from this Table. May be better to add
+another column to distinguish this aspect across papers? }
+    
+	\vspace{1mm}
+Giuseppe (e, successivamente, Francesca)
+ 		
+		
+	\item \textbf{Another important comment I have is in relation to the presented results in Section 5.4.
+What is the understanding with respect to the problem characteristics? Can you interpret
+the learning with respect to the policy selection? Which characteristics go with what type of policy? I thought this was the goal and that there would be interpretations around this.
+To me, without an elaborate discussion of the mapping between the policies and the
+problem characteristics, the mentioned goals are not complete. If we want to move those
+ideas to operations, this interpretation should be there.} 
+    
+\vspace{1mm}
+Alessio
+
+	
+
+	 \item \textbf{In section 4.2 the authors list the features they considered. For the set of the features the
+authors used here, is there any evidence that this is indeed performing better than other
+potential feature sets? Was there any analysis on this? Furthermore, the definition of
+certain features are also based on certain insights I assume, for example the percentage of
+collection points etc. have specific descriptions. Would be good to elaborate on this
+further.} 
+	 
+	 \vspace{1mm}
+Alessio  
+
+	 \item \textbf{Otherwise, the paper is quite well written and easy to follow. I read it with great interest.
+One small thing i noticed, at the top of page 4, 2nd line it says: “The latter also
+One small thing i noticed, at the top of page 4, 2nd line it says: “The latter also
+consider...", it should be “The latter also considers..."} 
+	 
+	 \vspace{1mm}
+Francesca
+
+\end{enumerate}
+
+\newpage
+	%===============================================================================
+	\section*{Reviewer \#3}
+	\vspace{3mm}
+Indicati esplicitamente il punto assegnato ad Alessio e il punto assegnato a Giuseppe. Il resto è assegnato a Simona, per come concordato.\\
+
+\vspace{2mm}
+\noindent\textbf{I thank the authors for the opportunity to review this manuscript. The paper addresses a
+relevant waste collection routing problem, and the interaction between collection time,
+uncertain waste accumulation and vehicle capacity is potentially valuable. However, the
+manuscript does not yet sufficiently establish the significance of its contribution or
+provide convincing computational validation.\\
+My principal concerns involve the positioning against existing models and algorithmselection
+approaches, clarification of the stochastic information structure, and
+experiments restricted to very small instances with limited scenario and generalisation
+testing.\\
+Addressing these concerns appears to require substantial further investigation and an
+expanded computational study. I therefore recommend rejection in its present form. I hope the detailed comments below will help the authors strengthen the work.}
+
+
+\begin{enumerate}
+\item \textbf{Abstract}
+\begin{itemize}
+\item \textbf{The abstract primarily describes the problem. Please identify the research gap and state
+the specific contributions relative to existing stochastic and time-dependent waste collection routing studies.}
+\item \textbf{The phrase “traditional methodology employing scenarios” is vague. Please identify the
+formulation and solution approach more precisely.}
+\item \textbf{Please clarify the role of machine learning: what the candidate policies represent, what
+the learning model predicts and why policy selection is useful.}
+\item \textbf{Although computational experiments are mentioned, their principal findings are not
+reported. Please include the main quantitative results and identify the comparison baseline.}
+\item \textbf{Please specify that synthetic instances are used and indicate their scale.}
+\end{itemize}
+%\noindent\textbf{Reviewer 3 -- Comment 1: Abstract}
+\vspace{1mm}
+
+\noindent\textbf{Response:}
+
+
+We thank the Reviewer for these suggestions. We agree that the original abstract placed excessive emphasis on the problem description and did not sufficiently highlight the specific methodological contributions and computational findings.
+
+We have therefore substantially revised the abstract to address all five points raised by the Reviewer. In particular, the revised version clarifies the research gap by emphasizing the interaction between stochastic intraday waste accumulation, service times, and vehicle capacity. It also provides a more precise characterization of the stochastic optimization formulation and its recourse mechanism, and explains the role of machine learning in selecting among alternative deterministic optimization policies based on instance characteristics.
+
+Furthermore, the revised abstract explicitly reports the main computational findings, identifying the best candidate policy as the comparison benchmark rather than the stochastic optimum. Finally, we clarify that the computational experiments are conducted on small synthetic instances, thereby providing a more accurate representation of the scope and limitations of the study.
+
+
+
+\item \textbf{1--Introduction}
+\begin{itemize}
+\item \textbf{The introduction would benefit from a more focused progression from the general waste
+management context to the operational problem investigated.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this suggestion. We agree that the Introduction can be made more focused by reducing the general discussion of waste management and emphasizing the operational decisions addressed in the paper. We have therefore revised the Introduction to provide a clearer progression from the uncertainty associated with waste accumulation to the joint routing and scheduling decisions considered. The revised presentation also highlights the relationship between collection times, vehicle capacity, and the expected amount of uncollected waste, which constitutes the main motivation for the proposed formulation.
+
+
+
+\item \textbf{The motivation for improving waste collection routing is reasonable. However, please
+strengthen the justification for explicitly modeling stochastic intraday demand increments. Under which operating conditions does this feature materially affect routing and scheduling decisions?}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for raising this important point. The relevance of explicitly modelling stochastic intraday demand increments arises in operating environments where waste generation varies significantly throughout the day and where the timing of collection affects both the amount of waste available for pickup and the residual capacity of the vehicles. For example, postponing a visit may increase the expected amount collected at a given location, but may also increase the probability of vehicle capacity saturation, potentially preventing the completion of subsequent visits. Conversely, collecting a location earlier may reduce capacity-related risks while leaving a larger amount of waste to accumulate before the end of the planning horizon. These competing effects create a direct interaction between routing, scheduling, and stochastic demand evolution. We have strengthened the Introduction to explain this interaction and to clarify the operating conditions under which intraday demand modelling is particularly relevant.
+
+
+
+
+\item \textbf{The examples involving schools and restaurants illustrate possible intraday patterns.
+Empirical evidence or a documented practical setting would strengthen their operational relevance.}
+
+
+
+
+\noindent\textbf{Response:} We agree that empirical observations would be valuable for characterizing intraday waste generation patterns. The examples involving schools and restaurants are intended to illustrate plausible differences in waste accumulation profiles rather than to represent empirically calibrated demand distributions. We have clarified this distinction in the revised Introduction. The present study adopts a synthetic experimental setting to investigate the methodological implications of stochastic, service-time-dependent waste accumulation. The calibration and validation of the proposed demand model using sensor measurements or operational data, falls beyond the scope of this paper, but we agree that it represents an important direction for future research. We mentioned it in the Conclusions and Future Developments section.
+
+
+\item \textbf{The authors explain the distinction between their intraday formulation and the interday
+implementation of Markov et al. (2020). However, Markov et al. also discuss accommodating continuous demand information through finer time discretisation. Please clarify what substantive modelling changes the proposed formulation introduces beyond
+finer discretisation.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this observation. We agree that the possibility of using a finer temporal discretization does not, by itself, establish a methodological novelty. Our contribution is not the introduction of shorter time periods, but the explicit integration of stochastic demand accumulation and service-time decisions within the routing problem. In our problem, the amount of waste available at each collection point is determined by its initial demand and the stochastic increments accumulated up to its scheduled collection time. Consequently, changing the service time modifies the distribution of the quantity to be collected, the probability of vehicle capacity saturation, and the expected amount of waste remaining at the end of the planning horizon. We have revised the Introduction to make this distinction more precise and to avoid suggesting that intraday discretization alone constitutes the contribution.
+
+
+
+
+
+\item \textbf{The novelty discussion should address Yu, Normasari and Chen (2021), “Locationrouting
+problem with time-dependent demands,” Computers \& Industrial Engineering, 151, 106936. Although their demand accumulation is deterministic, their model already considers pickup quantities that depend on vehicle arrival time. Please explain the
+additional contribution of the proposed stochastic intraday formulation.}
+
+
+
+\noindent\textbf{Response:} We thank the Reviewer for suggesting this relevant reference, that we included in the paper. We agree that time-of-service dependent demand is not, in itself, a new modeling feature. As highlighted by the Reviewer, Yu, Normasari and Chen (2021) consider a location-routing problem in which pickup quantities depend on vehicle arrival times within a deterministic setting. Our problem, instead, addresses a different combination of modeling features by considering stochastic demand increments accumulated during the day, with distributions depending on collection point characteristics and time periods. The resulting uncertainty affects vehicle capacity utilization and the expected cost associated with waste remaining uncollected. We have revised the Introduction and the literature review to acknowledge the existing contribution on deterministic time-dependent demand and to identify more precisely the stochastic component and its interaction with routing and scheduling decisions.
+
+
+
+\item \textbf{The first two listed contributions appear to overlap. Introducing a new waste collection
+problem and incorporating stochastic intraday demand increments describe the same
+modelling contribution. Please consolidate these statements and distinguish the remaining
+contributions.}
+
+
+\noindent\textbf{Response:} We agree with the Reviewer that the first two contributions in the original Introduction partially overlap. We have therefore consolidated them into a single contribution concerning the modeling of stochastic intraday demand accumulation and its interaction with collection times and vehicle capacity. We have also revised the remaining contributions to distinguish the scenario-based stochastic formulation from the machine learning-based selection of deterministic optimization policies.
+
+
+
+\item \textbf{The introduction explains that ML selects a policy based on instance features. Please
+position this contribution against existing learning-based algorithm-selection research,
+particularly Asín-Achá et al. (2024), “Selecting fast algorithms for the capacitated vehicle
+routing problem with machine learning techniques,” Networks, 84, 465–480. The manuscript should explain what its candidate policies and integration with stochastic optimisation add to established portfolio-selection approaches.}
+
+\noindent\textbf{Response:}  We agree that selecting an algorithm from a portfolio according to instance characteristics is an established approach and should not be presented as a methodological novelty in itself. As pointed by the Reviewer, Asín-Achá et al. (2024) exploit ML to select a solution algorithm to solve a CVRP instance, based on its features. The specific contribution of our framework lies in its application to the selection of deterministic policies to derive a first stage solution in a two-stage stochastic programming with recourse. Rather than selecting among alternative algorithms for solving the same deterministic formulation, our candidate policies employ different approximations of stochastic demand and vehicle capacity, potentially producing different routing and scheduling decisions. The learning model predicts which policy is expected to perform best for a given instance in terms of the objective value evaluated under uncertainty. We have revised the Introduction to acknowledge previous learning-based algorithm-selection research and to clarify the specific role of policy selection in our stochastic optimization setting.
+\end{itemize}
+
+
+\item \textbf{2 -- Related literature}
+\begin{itemize}
+\item \textbf{Please streamline the broad waste management background and summaries of review
+articles. Place greater attention to the studies most relevant to the formulation and
+solution methodology.}
+\item \textbf{The review should focus primarily on stochastic and time-dependent waste collection
+routing, while also addressing service-time-dependent pickup models and learning-based
+algorithm selection.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for these suggestions. We agree that the original literature review devoted excessive space to general waste management studies and survey articles, while the contributions most closely related to our problem deserved greater attention. We have therefore streamlined the background discussion, reorganized the literature review to emphasize stochastic waste collection routing, time-dependent demand, and machine learning-based optimization approaches, and significantly shortened the discussion of the surveys.
+
+
+\item \textbf{Please compare the closest studies more systematically in terms of demand evolution,
+service-time dependence, information availability, planning horizon and recourse decisions.}
+\item \textbf{Table 1 is useful, but its categories do not fully establish the claimed distinction. Please explicitly distinguish intraday from interday demand evolution and indicate whether collected quantities depend on service time.}
+
+
+
+\noindent\textbf{Response:} We agree that the original comparison table did not sufficiently distinguish the temporal structure of demand uncertainty from the planning horizon. In particular, a single-day planning horizon does not necessarily imply intraday demand accumulation, and a multi-period formulation does not necessarily capture the dependence of collected quantities on service times. We have therefore revised Table 1 to distinguish demand evolution from the planning horizon and to explicitly indicate whether pickup quantities depend on the scheduled service time. We have also expanded the accompanying discussion to clarify the information structure and recourse mechanisms of the most closely related studies.
+
+
+
+\item \textbf{Where publication timing permits, please consider Huang et al. (2026), “Dynamic
+Collection Routing Optimization for Domestic Waste with Mixed Fleets,” Systems,
+14(5), 461. This study considers intraday waste-generation patterns and random
+fluctuations. Please clarify differences in demand modelling, information availability and
+operational decisions.}
+\end{itemize}
+ 
+\vspace{1mm}
+xxx
+
+\item \textbf{3 -- Problem description and mathematical formulation}
+\begin{itemize}
+\item \textbf{The information structure requires clarification. Demand becomes known sequentially
+upon arrival at collection points, whereas Section 3.2 assumes a single recourse decision moment with full knowledge of the problem data. Please explain how the two-stage representation corresponds to the operational process. If recourse follows a predetermined rule of returning to the depot when capacity is
+exhausted, please demonstrate that its scenario-based implementation depends only on
+information available at that point. The statement that the representation is conservative
+also requires justification.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for highlighting this important issue. We agree that the original description of the information structure was potentially misleading, particularly the statement suggesting that recourse decisions are made with full knowledge of future demand realizations. We have revised Section 3.2 to clarify that the proposed model employs a predefined recourse policy rather than an unrestricted wait-and-see optimization procedure. Specifically, routing and scheduling decisions are determined before uncertainty is revealed, whereas the operational recourse rule is applied sequentially as vehicles observe demand at collection points. Once vehicle capacity is exhausted, the vehicle returns to the depot and skips the remaining planned visits. This action depends only on the cumulative demand observed along the executed portion of the route and does not require knowledge of future demand realizations. Complete scenarios are used exclusively to evaluate the cost of applying this fixed recourse rule under different demand realizations. We have therefore removed the misleading reference to full information at the recourse stage and clarified the relationship between the two-stage formulation and the sequential operational process.
+
+
+
+
+
+\item \textbf{Section 3.3 omits the underlying stochastic programme and its second-stage conditions.
+Since stochastic modelling is central to the contribution, please provide a self-contained
+formulation or a precise explanation linking the operational problem to the scenariobased
+model.}
+
+Francesca e Giuseppe
+
+
+
+\item \textbf{Please strengthen the practical justification for the recourse restriction. Vehicles
+abandon the remaining route after reaching capacity, without unloading and continuing or
+reassigning collection points. In which operating settings is this appropriate?}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this observation. We agree that the operational setting underlying the restricted recourse mechanism should be more clearly motivated. We have expanded Section 3.2 to clarify that our formulation addresses a collection system in which routes are determined before the operating day and each vehicle performs at most one collection trip. When vehicle capacity is exhausted, the remaining planned visits are postponed rather than reassigned to other vehicles. This setting is relevant when unloading and resuming collection would require additional travel and handling time that may not be compatible with the available working shift, or when operational procedures do not support real-time route modifications. We have also explicitly acknowledged that the proposed recourse mechanism does not cover more flexible operations involving multiple trips, intermediate unloading facilities, or dynamic reassignment of collection points. These extensions would require a different recourse structure and are outside the scope of the present study.
+
+
+\item \textbf{The objective applies the same unit penalty to waste left because of capacity shortages
+and waste generated after a scheduled collection. Please justify this treatment, given that
+post-collection accumulation may be a normal feature of daily operations.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this observation. We agree that waste accumulated after a scheduled collection is a normal feature of daily operations. However, our objective function does not distinguish between the causes of uncollected waste, as the penalty is intended to represent the amount of waste remaining in the collection system at the end of the planning horizon. Whether this quantity results from vehicle capacity saturation, skipped collection points, or waste generated after a scheduled visit, it contributes to the residual workload that must be handled in the following collection day. Consequently, we consider it appropriate to apply the same unit penalty to all residual waste, regardless of its origin. We have clarified this interpretation in Section 3.2, emphasizing that the penalty measures residual waste rather than the occurrence of a service failure.
+
+
+
+\item \textbf{Constraints (7) appear to permit waiting between visits. Please clarify whether waiting
+and delayed departures are allowed, how they influence scheduling and whether associated costs are considered.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this observation. We confirm that waiting between consecutive visits is permitted in our formulation. This is an intentional modelling choice, since the amount of waste available for collection depends on the time at which a collection point is visited. Allowing waiting times enables the model to optimize both routing and scheduling decisions. Delaying a visit may reduce the amount of waste generated after collection, but it may also increase the quantity collected and the risk of vehicle capacity saturation. These trade-offs are accounted for in the objective function. No explicit monetary penalty is associated with waiting; however, waiting is subject to the overall planning horizon and may affect the resulting routing and collection costs.
+
+
+
+\item \textbf{Please explain the convention for assigning demand increments at the beginning of each
+time slot and discuss sensitivity to temporal discretisation.}
+
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this observation.  Assigning demand increments to the beginning of each time slot is a modelling convention rather than an assumption that waste is generated instantaneously. Each increment represents the quantity generated over the corresponding interval, which is aggregated at its beginning to determine the demand available at scheduled collection times. We also acknowledge that temporal discretisation affects the accuracy of the demand representation. Finer time slots allow a more detailed description of intraday demand accumulation, while increasing the size and computational burden of the scenario-based formulation.
+
+
+
+\item \textbf{Please clarify how constraints (17)-(21) enforce the saturation and route-skipping rule,
+including the case in which cumulative demand exactly equals vehicle capacity.}
+\item \textbf{Please state the assumptions concerning service times and dependence between demand
+increments across collection points and periods. The determination of the large constants
+should also be explained.}
+\end{itemize}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this observation. Assigning demand increments to the beginning of each time slot is a modelling convention adopted to represent intraday waste accumulation within a discrete-time framework. The increments represent waste generated over the corresponding intervals, rather than waste physically generated instantaneously at their beginning. We acknowledge that the temporal resolution may influence the quantity of waste available at the time of collection, particularly for visits occurring close to time-slot boundaries. A finer discretisation can provide a more accurate representation of demand evolution, at the expense of increased computational complexity. We have added a discussion of this trade-off and clarified that the proposed formulation can accommodate different time-slot durations without requiring structural modifications.
+
+ 
+\vspace{1mm}
+xxx
+
+\item \textbf{4 -- Solution methodology}
+\begin{itemize}
+\item \textbf{Please define “policy” consistently. The candidate policies appear to be alternative
+deterministic optimisation procedures for constructing routing and scheduling plans.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this observation. We agree that the term ``policy'' could be interpreted as an adaptive decision rule, whereas our candidate policies are deterministic optimization procedures for constructing a priori routing and scheduling plans. We have clarified this definition at the beginning of Section 4 and now use the terminology consistently throughout the manuscript. In particular, we explicitly distinguish the deterministic procedure used to generate a plan from the predefined operational recourse mechanism used to evaluate that plan under stochastic demand.
+
+ 
+
+
+
+
+\item \textbf{Please justify the choice of demand approximations, capacity adjustments and
+adjustment percentages. A sensitivity analysis would help establish whether the results
+depend strongly on these choices.}
+
+Alessio
+
+
+\item \textbf{Please provide sufficient detail to reproduce each procedure, particularly the scheduling
+of visits and treatment of capacity violations in the modified VRPs.}
+
+Alessio
+
+
+\item \textbf{Statements suggesting that the ML framework ensures an optimal or nearly optimal
+policy should be qualified. Prediction does not guarantee this outcome, and the best
+candidate policy is not necessarily close to the stochastic optimum.}
+
+
+We agree with the Reviewer that the original wording overstated the guarantees provided by the machine learning framework. We have revised Sections 4 and 4.2 to remove statements suggesting that the selected policy is necessarily optimal or nearly optimal. We now explicitly acknowledge that prediction errors may lead to selecting a suboptimal candidate and that the best policy within the considered portfolio is not necessarily close to the stochastic optimum. Accordingly, the effectiveness of the proposed approach is evaluated empirically rather than presented as a theoretical guarantee.
+
+\item \textbf{Please report the ML implementation details, including hyperparameters, tuning
+procedures, random seeds and the tolerance used for multilabel classification.}
+
+Alessio
+
+
+\item \textbf{Please distinguish offline label-generation and training costs from online feature extraction, prediction and solution of the selected optimisation model.}
+
+Alessio
+
+\end{itemize}
+ 
+\vspace{1mm}
+xxx
+
+\item \textbf{5 -- Computational results}
+\begin{itemize}
+\item \textbf{The experiments contain only five to eight collection points. Small instances are useful
+for comparisons with near-optimal reference solutions, but additional experiments at larger scales are needed to support claims of practical relevance and computational efficiency.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this observation. We acknowledge that the computational experiments are restricted to relatively small instances and that they do not establish the scalability of the proposed approach to large-scale waste collection systems. However, the primary objective of our computational study is to investigate the effectiveness of instance-dependent policy selection in a stochastic routing problem, rather than to demonstrate large-scale computational performance. The considered instance sizes were deliberately chosen to allow meaningful comparisons with the scenario-based stochastic formulation, which becomes computationally challenging even for a limited number of collection points. Indeed, our results show that obtaining high-quality reference solutions can be difficult even for instances with eight collection points. This computational difficulty is one of the motivations for investigating alternative deterministic optimization procedures and machine learning-based policy selection. We agree that experiments on larger instances would be necessary to establish practical scalability, and we have revised the manuscript to clarify the methodological scope of the computational study and explicitly acknowledge this limitation. We have also moderated the conclusions concerning computational efficiency and practical applicability, which are now restricted to the experimental setting considered.
+
+
+\item \textbf{Please make the generated instances and accompanying documentation available in a
+public repository. The documentation should describe the file format, parameters, units,
+demand-generation procedure and random seeds. Providing the instance-generation code
+would further support reproducibility.}\\
+Giuseppe
+
+
+\item \textbf{Only five scenarios are used. Please justify this choice, investigate sensitivity to
+scenario count and evaluate the resulting plans on independent demand realisations.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for highlighting this important issue. The use of five scenarios was primarily motivated by the computational complexity of the scenario-based stochastic formulation. As shown by our computational results, even instances involving a limited number of collection points can be challenging to solve within the prescribed time limit. We acknowledge, however, that this computational consideration does not establish that five scenarios are sufficient to accurately approximate the underlying demand distribution.
+
+The computational experiments are intended to provide a controlled comparison of the proposed optimization procedures under a common scenario-based representation of uncertainty. We recognize that increasing the number of scenarios and evaluating the resulting solutions on independent demand realizations would provide a stronger assessment of their out-of-sample performance and robustness. We have therefore clarified the scope of the computational results and explicitly acknowledged these limitations in the revised manuscript. In particular, we avoid interpreting the reported scenario-based objective values as definitive estimates of the expected costs under the full demand distribution.
+
+
+\item \textbf{Please document the instance-generation procedure more fully, including collection point
+type assignment, travel costs and times, penalty coefficients, demand dependence and random seeds.}
+
+Giuseppe
+
+\item \textbf{Synthetic instances can support a methodological study, but their demand patterns and
+parameter ranges should be justified in relation to relevant operating conditions.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this observation. We agree that the use of synthetic instances requires a clearer explanation of the operational rationale underlying the demand patterns and parameter ranges. We have therefore expanded Section 5.1 to clarify the design of the instance-generation procedure. In particular, the three demand patterns are intended to represent the heterogeneity of intraday waste accumulation across different types of collection points, such as residential, educational, and commercial locations. The multiplicative factors used to distinguish low, average, and high demand levels allow us to generate different temporal profiles and investigate their effects on routing and scheduling decisions. Likewise, the different vehicle capacities are intended to represent operating conditions with varying degrees of capacity pressure, which directly affects the probability of route interruption and the amount of residual waste. We emphasize that these parameters were selected to construct heterogeneous benchmark instances for a methodological investigation and were not calibrated using observations from a specific collection system. We have clarified this distinction in the revised manuscript and acknowledged that empirical calibration would be necessary before applying the proposed approach to a particular operational setting.
+
+
+\item \textbf{To isolate the benefit of the modelling contribution, please compare the proposed approach with a comparable formulation that omits intraday demand variation. The stochastic-versus-expected-value comparison alone does not establish the value of
+intraday modelling.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this important observation. We agree that the comparison between the stochastic model (SM) and the expected-value model (EM) does not isolate the contribution of intraday demand variation. Both formulations incorporate the time-dependent structure of demand, whereas their main difference concerns the explicit representation of uncertainty. Therefore, the reported VSS-type measure should be interpreted as an assessment of the benefit of accounting for stochastic demand within the proposed time-dependent setting, rather than as a measure of the value of intraday demand modeling itself.
+
+We have clarified this distinction in the revised manuscript and moderated the interpretation of the computational results accordingly. The specific contribution of intraday demand variation could be assessed by comparing the proposed formulation with a stochastic counterpart in which demand increments do not depend on the time slot. Such a comparison would isolate the temporal component while preserving uncertainty. We acknowledge that this additional investigation is not included in the present computational study and have identified it as a direction for future research.
+
+
+
+\item \textbf{Please distinguish instances for which no feasible solution was found within the time
+limit from those proven infeasible. The recurring proportion of “not solved” instances in
+Table 5 needs explanation.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for pointing out this ambiguity. We agree that the absence of a feasible solution within the time limit must be clearly distinguished from proven infeasibility. In our computational analysis, the term ``not solved'' refers to instances for which Gurobi did not identify a feasible solution within the prescribed time limit of 3600 seconds. This classification does not imply that these instances are infeasible. Conversely, instances classified as ``solved'' are those for which at least one feasible solution was found, even when optimality could not be proven.
+
+We have revised Section 5.2 to make this distinction explicit. We have also expanded the discussion of Table 5 to explain that the difficulty of the scenario-based formulation arises from the interaction between routing, scheduling, stochastic demand accumulation, capacity saturation, and scenario-dependent route skipping. These features can make the identification of feasible solutions challenging even for instances with relatively few collection points.
+
+
+
+\item \textbf{The VSS-type measure uses computed solution values, some associated with substantial
+optimality gaps. Please distinguish estimates from certified values and discuss how incomplete optimisation affects their interpretation.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this important observation. We agree that the VSS-type measure computed in our experiments should not be interpreted as an exact or certified Value of the Stochastic Solution when the underlying optimization models have not been solved to proven optimality. In particular, the stochastic objective values used in the comparison may correspond to feasible solutions with nonzero optimality gaps, and the resulting differences do not necessarily represent the true improvement associated with stochastic optimization.
+
+We have revised Section 5.2 to explicitly distinguish the computed VSS-type estimates from exact values and to clarify the implications of incomplete optimization. We now emphasize that the reported values quantify the observed differences between the solutions obtained within the computational time limit, rather than certified differences between optimal objective values. We have also moderated the discussion of the computational results to avoid interpreting these estimates as definitive measures of the value of stochastic optimization.
+
+
+\item \textbf{The policy and ML experiments use 178 instances selected for near-optimal solvability
+and a VSS of at least 4\%. Please assess performance on a broader test population or
+explicitly limit the conclusions to this selected subset.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this important observation. We agree that the VSS-type measure reported in the manuscript cannot always be interpreted as an exact Value of the Stochastic Solution, since some instances are not solved to proven optimality within the prescribed time limit. In these cases, the computed stochastic objective value corresponds to a feasible solution and may differ from the optimal value.
+
+We would nevertheless like to emphasize that the reported comparison remains informative, as it measures the difference between the objective values of the solutions actually obtained by the stochastic and expected-value approaches. Moreover, the subsequent policy-selection experiments are restricted to instances for which the stochastic model was solved to optimality or near-optimality, with an optimality gap not exceeding 0.001, thereby limiting the effect of incomplete optimization on the reference values used in that analysis.
+
+
+
+\item \textbf{The ML evaluation uses one split containing 115 training and 63 test instances. Please
+strengthen the assessment through repeated splits or cross-validation and report
+variability in performance. Any tuning should remain independent of the final evaluation
+data.}\\
+
+Alessio
+
+\item \textbf{Please clarify whether P7 was selected as the best fixed policy using training data only.
+Baseline selection should be independent of test-set outcomes.}
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this observation. We confirm that P7 is also the best-performing fixed policy when the selection is restricted to the 115 training instances. Therefore, the choice of P7 as the baseline does not depend on the outcomes of the test set.
+
+
+
+\item \textbf{The Ideal-policy selects the best of the twelve candidate procedures. It is a bestachievable
+reference within that portfolio, rather than a lower bound on the original stochastic optimisation problem. A 3\% gap to this reference therefore does not
+demonstrate near-optimality for the WCRP-TVSD.}
+
+
+
+\noindent\textbf{Response:} We thank the Reviewer for this clarification. We agree that the Ideal-policy should not be interpreted as a lower bound on the optimal objective value of the original stochastic optimization problem. Rather, it represents the best achievable performance within the portfolio of twelve candidate deterministic policies, assuming perfect knowledge of their performance on each instance.
+
+The purpose of this benchmark is to assess the effectiveness of the ML-based policy selection mechanism, independently of the quality of the candidate policies themselves. Accordingly, the reported 3\% gap of MultiRegression with respect to the Ideal-policy indicates that the ML selector approaches the performance of an oracle that always chooses the best candidate policy. It does not imply that the resulting solutions are within 3\% of the stochastic optimum.
+
+We have revised Section 5.4 to clarify the role of the Ideal-policy and have modified the discussion of the computational results and the conclusions to avoid interpreting the gap to this benchmark as a measure of near-optimality for the WCRP-TVSD.
+
+
+\item \textbf{Please compare the ML-selected solutions directly with reliable stochastic-model
+reference values where available, alongside the comparison with the Ideal-policy.}
+
+Alessio
+
+\item \textbf{Table 7 should include end-to-end computational times for the ML approaches and
+relevant baselines. Since the candidate policies have substantially different runtimes, executing one policy does not by itself establish the claimed computational advantage.}
+\item \textbf{Please interpret training and test results separately. The combined OVERALL results do
+not provide evidence of generalisation, and claims of reliable performance should reflect
+the limited evaluation.}
+\end{itemize}
+
+Alessio
+ 
+\vspace{1mm}
+xxx
+
+\item \textbf{6 -- Conclusions}
+\begin{itemize}
+\item \textbf{Please distinguish the specific modelling contribution from established elements such as stochastic programming and learning-based policy selection.}
+\item \textbf{Claims of practical effectiveness, reliability and near-optimality should be moderated to
+match the evidence, or supported by the additional experiments requested above.}
+\item \textbf{Please identify the reported 3\% gap explicitly as a gap to the best candidate policy,
+rather than to the stochastic optimum.}
+\item \textbf{Please state the experimental limitations prominently, including the small synthetic
+instances, limited scenario count and selected ML dataset.}
+\item \textbf{The conclusion describes the ML selector in terms of classification algorithms, although
+the best-performing approach uses regression. Please correct this description.}
+\item \textbf{Please clarify that the average VSS of 21.33\% is calculated over the 597 instances with
+reported feasible solutions, rather than all 720 generated instances.}
+\end{itemize}
+ 
+\vspace{1mm}
+xxx
+ 	
+\end{enumerate}
+
+\noindent \textbf{I appreciate the authors’ efforts and the potential value of the research question. A clearer
+positioning of the contribution, a rigorous explanation of the information structure and
+substantially stronger computational validation are necessary before the manuscript can
+be considered for publication.\\
+Disclose statement: During the preparation of these comments, I used ChatGPT to help
+refine and organise my comments and identify relevant literature. After using this tool, I
+reviewed and edited the content as needed, and I take full responsibility for the report’s
+content.}
+
+%\newpage 
+%\begin{thebibliography}{99}
+%\bibliographystyle{plainnat}
+
+%\bibitem[Liao et al. (2025)]{Liao2025}
+%Liao S., Xu Y., Niu Y., Cao Z. (2025). Learning-guided bi-objective evolutionary optimization for green municipal waste collection vehicle routing, \textit{Journal of Cleaner Production}, 501, 145316.
+
+%\bibitem[Mancini and Gansterer(2026)]{Mancini2026}
+%Mancini S., Gansterer M. (2026). Dynamic stochastic parcel locker assignment with uncertain pick-up times, \textit{Omega}, 140: 103478.
+
+%\bibitem[Nguyen et al.(2025)]{Nguyen2025}
+%Nguyen D.V.A., Gunawan A., Misir M., Hui L.K., Vansteenwegen P. (2025). Deep reinforcement learning for solving the stochastic e-waste collection problem, \textit{European Journal of Operational Research}, 327(1): 309--325.
+
+%\bibitem[Sclafani et al.(2025)]{Sclafani2025}
+%Sclafani A., Mancini S., Ceschia S., Meneghetti A., Gansterer M. (2025). Classification-based policies for the online on-demand warehousing problem, \textit{Annals of Operations Research}.% \url{https://doi.org/10.1007/s10479-025-%06939-4}.
+
+%\bibitem[Xu et al.(2025)]{Xu2025}
+%Xu X., Wu T., Wang S., Zhang S., Xu Z., Yang B., Ding Z., Shen L. (2025). Optimization of reliable vehicle routing problem for medical waste collection with time windows in stochastic transportation networks, \textit{Engineering Optimization,} 57(8): 2109--39.
+
+
+
+
+%\end{thebibliography}
+
+ 		
+\end{document}
